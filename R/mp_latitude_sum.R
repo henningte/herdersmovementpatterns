@@ -1,0 +1,43 @@
+#' @importFrom Rdpack reprompt
+#' @importFrom trajectories Track
+#' @importFrom spacetime STIDF
+NULL
+
+#' Computes the sum of the latitudinal transitions of a Track object.
+#'
+#' \code{mp_latitude_sum} sums the latitude differences between adjacent campsite
+#' locations for a \code{\link[trajectories:Track-class]{Track}}.
+#'
+#' @param t An object of class \code{\link[trajectories:Track-class]{Track}}
+#' with a variable \code{location} and \code{campsite} in the data slot.
+#' @return a numeric value representing the sum of the latitude transitions
+#' for \code{t}.
+#' @seealso .
+#' @examples #
+#' @export
+mp_latitude_sum <- function(t){
+
+  # checks
+  if(!(inherits(t, "Track"))) {
+    stop("t must be a Track object\n")
+  }
+  if(!(any(colnames(t@data) %in% c("location", "campsite")))) {
+    stop("t must have the variables 'location' and 'campsite'\n")
+  }
+
+  # get an index of entries refering to campsite locations that are not duplicated and no gaps
+  sel <- t@data
+  index <- which(sel$location != 0 & sel$campsite)
+  index <- index[!duplicated(sel$location[index])]
+
+  # extract the corresponding values and create a new Track
+  newt <- trajectories::Track(track = spacetime::STIDF(sp = t@sp[index,],
+                                                       time = t@time[index],
+                                                       data = sel[index,],
+                                                       endTime = t@time[index]))
+
+  # compute the sum of the latitude transitions
+  latitude <- newt@sp@coords[,2]
+  sum(latitude[-1]-latitude[-length(latitude)])
+
+}

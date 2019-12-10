@@ -1,13 +1,39 @@
 Package: herdersmovementpatterns
-Title: What the Package Does (One Line, Title Case)
+Title: Computing Movement Summary Indicators for GPS Trajectories of Nomadic Households
 Version: 0.0.0.9000
-Authors@R: 
-    person(given = "First",
-           family = "Last",
+Authors@R:
+    c(person(given = "Henning",
+           family = "Teickner",
            role = c("aut", "cre"),
-           email = "first.last@example.com")
-Description: What the package does (one paragraph)
-License: MIT + file LICENSE
+           email = "h_teic01@wwu.de"),
+      person(given = "Christian",
+           family = "Knoth",
+           role = c("aut"),
+           email = "...")     
+           )
+Description: This package computes various movement summary indicators
+    for nomadic household GPS trajectories that were processed with the
+    R package HerdersTrajectories (\url{https://github.com/henningte/herdersTA}).
+License: GPL-3 + file LICENSE
 ByteCompile: true
 Encoding: UTF-8
 LazyData: true
+Imports: 
+    methods,
+    bookdown,
+    here,
+    Rdpack,
+    sp,
+    raster,
+    dplyr,
+    rlang,
+    rgeos,
+    spacetime,
+    trajectories,
+    data.table
+Suggests: 
+    devtools,
+    git2r
+RdMacros: 
+    Rdpack
+RoxygenNote: 7.0.2
