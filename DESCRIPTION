@@ -9,10 +9,10 @@ Authors@R:
       person(given = "Christian",
            family = "Knoth",
            role = c("aut"),
-           email = "...")     
+           email = "christian.knoth@uni-muenster.de")     
            )
 Description: This package computes various movement summary indicators
-    for nomadic household GPS trajectories that were processed with the
+    for GPS trajectories of nomadic households that were processed with the
     R package HerdersTrajectories (\url{https://github.com/henningte/herdersTA}).
 License: GPL-3 + file LICENSE
 ByteCompile: true
