@@ -1,0 +1,16 @@
+base
+magrittr
+dplyr
+tidyr
+ggplot2
+directlabels
+permute
+lattice
+vegan
+MuMIn
+cowplot
+kableExtra
+sf
+dendextend
+herdersmovementpatterns
+knitr

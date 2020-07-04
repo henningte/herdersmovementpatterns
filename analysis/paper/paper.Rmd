@@ -1,0 +1,1229 @@
+---
+title: Patterns in Mongolian Nomadic Household Movement Derived from GPS Trajectories
+author:
+  - name: Henning Teickner
+    email: henning.teickner@uni-muenster.de
+    affiliation: ifgi
+  - name: Christian Knoth
+    email: christian.knoth@uni-muenster.de
+    affiliation: ifgi
+    footnote: 1
+  - name: Thomas Bartoschek
+    email:
+    affiliation: ifgi
+  - name: Kati Kraehnert
+    email:
+    affiliation: picir
+  - name: Melinda Vigh
+    email:
+    affiliation: feba
+  - name: Myagmartseren Purevtseren
+    email:
+    affiliation: dgnum
+  - name: Munkhnaran Sugar
+    email:
+    affiliation: dgnum
+  - name: Edzer Pebesma
+    email:
+    affiliation: ifgi
+address:
+  - code: ifgi
+    address: Institute for Geoinformatics, University of Münster, Heisenbergstraße 2, DE-48149
+  - code: picir
+    address: Potsdam Institute for Climate Impact Research
+  - code: feba
+    address: Faculty of Economics and Business Administration, Vrije Universiteit Amsterdam
+  - code: dgnum
+    address: Department of Geography, National University of Mongolia
+footnote:
+  - code: 1
+    text: "Corresponding Author"
+abstract: |
+  This paper presents an approach for a quantitative analysis of movement patterns of nomadic households based on GPS trajectories. We distributed GPS loggers to 400 Mongolian herder households who carried them over a 9-month period, continuously recording position data every 30 minutes. A total of 142 of the resulting trajectories fulfilled our data quality criteria and were considered during the analysis. Based on this data, we derive summary indicators describing key parameters of the households' mobility including measures of distance and number of movements as well as shape characteristics of the trajectories. We conduct an explorative statistical analysis of these summary indicators to investigate patterns in the nomadic mobility. We identify three movement strategies based on the number of different campsite locations and the distances traveled between campsites. We also compare the results to the existing literature on the mobility of Mongolian herders. Our findings show that GPS-based studies present a suitable framework to quantitatively analyze different movement strategies of nomadic herders.
+
+journal: "Applied Geography"
+date: "`r Sys.Date()`"
+bibliography: references.bib
+#linenumbers: true
+#numbersections: true
+csl: "../templates/elsevier-harvard.csl"
+output: 
+  rticles::elsevier_article:
+    number_sections: true 
+
+---
+
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+# rmarkdown setup
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  echo = FALSE,
+  comment = "#>",
+  fig.path = "../figures/",
+  fig.pos = "H",
+  fig.align = "center",
+  dev = "pdf"
+)
+
+# packages
+library(herdersmovementpatterns) # functions of the research compendium
+library(magrittr) # data wrangling
+library(dplyr) # data wrangling
+library(tidyr) # data wrangling
+library(ggplot2) # plots
+library(directlabels) # plots
+library(vegan) # PCA
+library(MuMIn) # R2 for GLM
+library(cowplot) # multi-panel plots
+library(kableExtra) # tables
+library(sf) # spatial operations
+library(dendextend) # PAM
+library(knitr) # for knitting and including graphics
+
+# set ggplot2 plot theme
+ggplot2::theme_set(cowplot::theme_cowplot())
+
+# set language for correct ggplot2 labels
+Sys.setenv(LANGUAGE="en")
+tmp <- Sys.setlocale("LC_TIME", "English")
+```
+
+
+# Introduction
+
+In Mongolia, which is among the five most heavily grazed countries in the world [@Sankey.2012], mobile pastoralism is of great societal importance, both economically and culturally. Mongolian grasslands form the world's largest contiguous grazing area [@Upton.2005]. On much of this grassland, soil productivity is low and forage availability is highly variable and difficult to predict. In this environment, permanent agriculture and sedentary animal husbandry are rare whereas nomadic herding is the predominant form of livelihood [@Himmelsbach.2012].
+In 2015, 25.2 percent of Mongolian households derived their livelihood solely from herding [@NationalStatisticsOfficeofMongolia.2019]. It is the main economic activity in rural Mongolia, and the nomadic lifestyle of Mongolian herders sustains this industry [@Sankey.2012]. Besides the economic aspects, nomadism carries immense cultural value as a core element of Mongolian identity [@Upton.2010].
+
+Climate change has an increasing impact on the livelihood of herders. They are particularly affected by natural hazards and adverse climate conditions because of the nature of their economic activities as well as their geographic location [@WorldBank.2009; @IPCC.2014]. In Mongolia, the greatest environmental risk to herding households is the growing frequency and severity of droughts and events of extreme winter conditions, so called dzuds. These catastrophes, which have occurred multiple times in recent years, lead to mass livestock deaths and pose a significant threat of poverty and forced outmigration of herding households to urban areas [@LehmannUschner.2018; @Sternberg.2010]. Since extreme weather events are expected to become more frequent and intense as a result of climate change [@Seneviratne.2012; @IntergovernmentalPanelonClimateChange.2013; @IntergovernmentalPanelonClimateChange.2007], there is great need for concepts to assist nomadic households in coping with these effects.
+This need is increased by the fact that Mongolian rangelands are fragile and often considered overused [@FernandezGimenez.2018], and state resources that can be invested in mitigation strategies are limited [@Stern.2011].
+
+In order to identify, understand and manage the specific negative impacts of unfavorable climate conditions on herding households, a better understanding of the mobility patterns of these households and their movement strategies for adapting to environmental conditions is crucial. Differences in mobility strategies (or the capacity to adopt them) are a key factor influencing the capabilities of Mongolian herders to cope with extreme weather events. In particular, the capability to conduct movement over greater distances, and/or in shorter time spans helps households to prevent high loss rates in the face of extreme weather events [@Murphy.2011]. As @FernandezGimenez.2015 have pointed out, mobility is a critical strategy not only during, but also before and after dzud.  Rapid movements of herds can be undertaken to prepare for or escape a weather disaster (e.g. drought or dzud) [@FernandezGimenez.2015].
+
+To date, knowledge on the mobility patterns of Mongolian herders is mainly based on household surveys and self-reported or estimated values for quantitative parameters [@FernandezGimenez.2007; @FernandezGimenez.2006; @FernandezGimenez.1996]. In such survey data, mobility information is typically constrained by reporting bias and by the degree to which respondents can reliably recall past movement retrospectively.  In contrast, nomadic migration profiles that are gathered using anthropological field research methods are usually limited in their representativeness. For example, @Murphy.2011 bases his study of nomadic households in Mongolia on a sample of four households that he accompanied for several months.
+There is no study analyzing movement patterns based on detailed geographic location data for a large number of households. As a consequence, available information on nomadic herders movement is mainly qualitative and restricted to a heuristic classification of different movement types. Importantly, there has been no attempt to analyze the interrelation of the frequency of movements, the typical distance covered between subsequent campsite locations, and the total distance covered in Mongolian nomadic movements.
+
+An additional issue with existing literature is that most of the studies date back to times during and even before the Soviet Union [@Batnasan.1978; @Jagvaral.1975; @Simukov.1934]. Due to post-soviet changes in the nomadic lifestyle and improved access to new transportation measures (e.g. trucks), it is unlikely that present movement of Mongolian nomads is the same as at least 40 years ago [@FernandezGimenez.2006; @Marin.2008]. We found only one recent study [@Ganbold.2015] summarizing Mongolian herders movement based on surveys with 50 households conducted in 2003 to 2004.
+
+In this paper we aim to demonstrate the value and feasibility of using detailed movement data based on GPS measurements for deriving mobility patterns of a large sample of nomadic households. We distributed GPS loggers to 400 Mongolian herder households who carried them over a 9-month period. The loggers recorded the position measurements every 30 minutes, creating detailed household-level trajectories of the herders' movements. Based on this data, we derived summary indicators describing key parameters of the households' mobility patterns, such as the number of movements to different campsites (and thereby pasture areas for the herds), the distances and altitude differences covered between pasture areas (in total and per movement), or the shape of the movement trajectories.
+We describe the processing steps needed to derive meaningful trajectories from the raw GPS data and for calculating the summary indicators. We conduct an explorative statistical analysis of these summary indicators and compare them to information on the mobility of Mongolian herders from the existing literature.
+
+In addition, we investigated whether there are distinct clusters of households based on their movement characteristics, as suggested by @Jagvaral.1975. In previous research, the capability of herders to move greater distances has been stated to be among the main factors affecting their ability to cope with extreme weather conditions (see, e.g., @Murphy.2011). Hence, we were interested in understanding if and how households differ in terms of covering large distances as part of their mobility strategies. Specifically, we investigated the relation between (1) the total distance covered by households during the study period, (2) the number of movements, and (3) the typical distance between subsequent campsite locations.
+We hypothesize that the interrelation between these characteristics is an important factor differentiating their mobility practices. We performed a regression analysis to analyze whether Mongolian households that move more often also cover larger total distances and whether increasing the distance between subsequent campsite locations may be a strategy to increase the total distance covered. Moreover, the regression model enabled us to quantify to what extent changes in both of these movement traits affect the total distance covered.
+
+To the best of our knowledge, this is the first time that GPS technology is used for systematically
+studying detailed migration patterns of nomadic families. Hence this paper is also meant to propose suggestions for conducting such a study. We discuss the steps for collecting the GPS data, practical risks and issues, economic considerations and lessons learned during the study. In addition we elaborate on different aspects of data quality and its implications for the analysis as well as the applicability of the results for the prediction of climate impacts on nomadic households and the development of coping strategies.
+
+# Methods
+
+## Study Area and Collection of GPS Data
+
+```{r aimags-area, include=FALSE, cache=TRUE}
+# download and unpack the shapefile
+download.file(url = "https://data.humdata.org/dataset/a9b0a8a6-cb14-448e-b35c-aa5eb51b0557/resource/dd683294-a2c6-4595-88df-a648be4aac7c/download/mng_admbnda_adm1_nso_v3.zip", 
+              destfile = "./../data/derived_data/aimags.zip")
+unzip("./../data/derived_data/aimags.zip", exdir = "./../data/derived_data/aimags")
+
+# import the data
+aimags <- 
+  sf::st_read("./../data/derived_data/aimags/mng_admbnda_adm1_nso_v3.shp") %>%
+  sf::st_transform(crs = "+proj=utm +zone=46 +datum=WGS84 +units=m +no_defs +ellps=WGS84 +towgs84=0,0,0")
+
+# compute the area of the target aimags
+aimags_number <- nrow(aimags)
+aimags_target <- c("Uvs","Zavkhan")
+aimags_area_total <- 
+  aimags %>%
+  sf::st_area() %>%
+  sum()
+aimags_target_area <- 
+  aimags %>%
+  filter(ADM1_EN %in% aimags_target) %>%
+  sf::st_area() %>%
+  sum()
+aimags_target_area_relative <- aimags_target_area/aimags_area_total
+
+# adjust units
+units(aimags_target_area) <- with(units::ud_units, "km^2")
+```
+
+The collection of GPS data took place in Mongolia in 2015 and 2016. A sub-sample of participating households was selected from the *Coping with Shocks in Mongolia Household Panel Survey* implemented by the German Institute for Economic Research in collaboration with the National Statistical Office of Mongolia (NSO).
+Given budget constraints for purchasing GPS loggers and auxiliaries, the sample was restricted to households in two survey provinces, Uvs and Zavkhan, with a total area of `r format(round(units::drop_units(aimags_target_area), 0), nsmall = 0, big.mark = ",")` km$^2$, which is about `r round(aimags_target_area_relative*100, 0)` % of the area of the country. Moreover, only those herding households were selected that reported having moved their campsite at least once in the past 12 months in the previous survey wave.
+
+```{r aimags-map, fig.height=3.5, fig.width=5.5, out.width= "0.8\\textwidth", fig.align="center", fig.cap=paste0("Map of Mongolia with province boundaries. The two grey shaded provinces represent the study area (Uvs and Zavkhan, from west to east). In total, Mongolia has ", aimags_number, " provinces. Source: Administration Of Land Affairs, Geodesy And Cartography of Mongolia.")}
+# map of the aimags
+ggplot() +
+  geom_sf(data = aimags, aes(fill = ADM1_EN %in% aimags_target)) +
+  scale_fill_manual(values = c("white", "grey")) +
+  theme_bw() +
+  theme(legend.position = "none")
+```
+
+GPS loggers were handed over to 400 households during the first phase of fieldwork in September and October 2015. During the second phase of fieldwork, between June and July 2016, households were visited again.
+GPS loggers were retrieved from 382 households, while 18 households could not be located. Prior to fieldwork, we developed a detailed data confidentiality protocol that follows the requirements of the German Act on Data Confidentiality. Each household was asked for their written consent to participate in the study. Households also received an information sheet that explained the aims of the project and the data protection measures.
+
+The aim of the GPS data collection was to document nomadic movements between campsites across seasons. Hence, the GPS loggers were attached to the main pole in the middle of the ger, the movable tent used by Mongolian nomads. Several measures were taken to maximize the GPS data coverage during the study period. The GPS loggers were programmed with an additional operating mode, which activated the devices only once every 30 minutes. Applying this operating mode instead of continuously recording allowed for up to three weeks of operating time per charge cycle. Each household also received a small solar-powered battery charger for recharging the logger. To reduce the dependency on weather conditions and the risk of data loss due to battery outage, households were additionally equipped with an external battery. This external battery held enough capacity for multiple charges of the GPS logger and could be recharged using the solar panel or other energy sources whenever possible. Households were contacted regularly throughout the study period via mobile phone, with a friendly reminder to recharge batteries.
+
+Each household received a monthly compensation of about 3~EUR, which was transferred via mobile phone credit. The total costs for the equipment (GPS logger, SD card, solar-powered battery charger, external battery) and compensation amounted to 146 EUR per household.
+
+## Preprocessing of GPS Data
+
+After collecting GPS loggers from households, the data were checked and prepared for import and analysis. File corruptions causing import errors (e.g., due to malfunctions during the file writing) were analyzed and - whenever possible - corrected. Data analysis was conducted in the open-source software environment R [@RCoreTeam.2017], using the trajectories package [@Pebesma.2018] for handling the specific trajectory data type and the herdersTA package [@Teickner.2020] (release "herdersmovementpatterns") specifically developed for this manuscript.
+The data was preprocessed to fit the requirements of this study: Since some households accidentally operated the GPS loggers in the continuous recording mode, all trajectories were downsampled to a temporal resolution of 30 minutes to achieve the same sampling scheme for all households.
+In light of the aim of this study, the subsequent analysis does not consider intraday movements, but focuses only on locations where households stayed overnight for a given amount of time. Therefore, we considered only GPS data recorded during 00:00 AM and 04:00 AM. For short periods (up to four days) without recorded GPS fixes, we assumed the overnight location of corresponding households as being constant when the GPS fixes right before and after these periods were no more than 800~meters apart.
+The threshold of 800 m was chosen based on visual inspection of the data, which revealed considerable noise of the GPS signal (i.e., random positional changes within a radius of a few hundred meters even during night time). We assume that this noise originates from metal plates typically placed at the top of the gers that disturbed the GPS readings. For this reason, a large threshold had to be chosen to correctly assign individual GPS records to the same location. A further reason was that upon multiple visits of the same location, the ger was not always placed exactly at the same position. Our experiments showed that a threshold of 800 m assures that such visits are assigned to the same location and at the same time preserves the separation between different neighboring campsite locations.
+
+## Identification of Campsite Locations, Visits and Movements
+
+In the preprocessed data, campsite locations were then identified. This was done using a two-step approach.
+First, we identified locations where households remained stationary without major movement for a certain amount of time. Here, density-based clustering [@Hahsler.2019] was applied to identify all locations with an accumulation of fixes (minimum of six fixes within a radius of 800 meters).
+In a second step, a household's presence at each of these locations was classified as either short term visit or campsite, depending on the duration of the stay. Only a continuous stay of four or more nights in a given location was classified as a campsite visit of the corresponding household.
+Inspection of those trajectories with very high data density (very few gaps) revealed that short-term visits typically had a duration no longer than four days. Due to the small amount of gaps in these cases and the fact that after such visits the GPS logger returned to the previous location with a longer visit, we assumed that these short-term visits were distinct from long-term movements of the ger. Since a large fraction of trajectories did not contain these short-term visits, but larger gaps, we decided to consider a continuous visit of at least four nights as campsite visit in contrast to a short-term visit.
+
+To further increase data coverage with regards to campsite locations, periods without location data were filled if they were shorter than 30 days and if the locations of a given household before and after the gap was the same. In this case, we assumed that a household remained at the same campsite. This was based on the assumption that when the nomadic households move their campsites away from a certain location they do not move it back to that location within less than 30 days.  Finally, we computed the median values of the original coordinates for each identified campsite location.
+This was possible for 348 of the 400 households that had received GPS loggers.
+For the remaining households, either the GPS loggers could not be recollected because the households could not be located, GPS data was not recorded due to technical failures, or no more than one campsite location could be identified according to our criteria, which made it impossible to compute most of the movement summary indicators.
+
+## Gap Filtering and Temporal Constraints
+
+```{r gap-filtering-study-period}
+# import all data on the trajectories
+d <- herdersmovementpatterns::d
+
+# plot of the density of the proportion and duration of gaps
+gap_filtering_density_plot <-
+    ggplot(d,
+           mapping = aes(x = gaps_proportion,
+                         y = gap_duration_max)) +
+    geom_density_2d() +
+    geom_point() +
+    geom_vline(xintercept = 0.3,
+               colour = "grey",
+               linetype = 2) +
+    geom_hline(yintercept = 30,
+               colour = "grey",
+               linetype = 2) +
+    theme_classic() +
+    labs(x = "Gap proportion",
+         y = "Maximum gap duration [d]")
+
+# get the median date for the first/last record
+dates_median <-
+  c(median(d$date_first_fix),
+    median(d$date_last_fix))
+
+# plot of start and end time of the study period
+gap_info_dates <- 
+  d %>%
+  dplyr::select(household_id, date_first_fix, date_last_fix) %>%
+  tidyr::gather("variable", "value", -household_id) %>%
+  dplyr::arrange(value)
+gap_info_dates$variable <-
+  gap_info_dates$variable %>%
+  dplyr::recode(date_first_fix = "First record", date_last_fix = "Last record") %>%
+  factor(levels = c("First record", "Last record"))
+
+dates_study_period_plot <-
+  ggplot(gap_info_dates, mapping = aes(x = value, linetype = variable)) +
+  stat_ecdf() +
+  labs(x = "Date", y = "Fraction of households") +
+  guides(linetype = guide_legend(title = " ")) +
+  theme_classic() +
+  theme(legend.position = "bottom") +
+  geom_vline(xintercept = dates_median,
+             colour = "grey",
+             linetype = 2) +
+  scale_x_date(limits = c(min(gap_info_dates$value), 
+                          max(gap_info_dates$value) + 30), 
+               breaks = dates_median)
+```
+
+While it is reasonable to fill periods without location data up to certain durations in light of the item of our analysis (campsite locations), longer periods cannot be filled without reducing confidence in the data and were therefore considered gaps. Data gaps potentially have important consequences for the analysis of movement patterns. Since movements occur at distinct time periods and the duration of the visit of a campsite location can vary (according to our definition) from four days to any longer duration, it is possible that visits of campsite locations are missed. This may lead to biased estimates of important movement characteristics, for example the number of different campsite locations visited or the covered distance, and consequently bears the risk of misleading interpretations.
+An uneven distribution of the proportion of gaps across households may represent another source of information bias. Consequently, it is important to control for the amount of gaps during the analysis of movement patterns. Additionally, the maximum duration of any gap is an important factor because the longer a gap is, the larger is the probability that a campsite visit was not recorded.
+Therefore, the trajectories were filtered both according to their proportion of gaps and the maximum duration of the gaps. Filtering refers to removing households that do not meet certain threshold values (for the proportion of gaps and the maximum duration of the gaps) from the sample of households.
+Unfortunately, there exist no best practices for setting thresholds for both variables. We used a density plot in order to identify thresholds in the proportion of gaps and the maximum duration of the gaps so that households with large proportions of gaps and gaps with a large duration were excluded, but a sample of sufficient size was retained (figure 2).
+A trade-off between loosing too many observations and applying conservative thresholds of acceptance was found by setting the maximum proportion of missing values to 30 % and the maximum duration of any gap to 30 days for the complete study period (see next paragraph).
+
+The time range of the GPS trajectories of different households varied. Reasons for this are that (1) the GPS loggers could not be distributed and recollected at the same time, (2) households differed in the way they handled the GPS devices, which may have resulted in different operating modes, and (3) gaps in the data also occur at the start and the end of the trajectories. Because several of the movement summary indicators we computed covary with the time, this varying temporal coverage may lead to artifacts, for example a difference in the number of visited campsite locations. To account for this, we clipped all data to a common study period. Defining start and end points of this study period is not a trivial problem because a trade-off between minimizing gaps for some households and enlarging temporal coverage, and hence representativeness, has to be found.
+We defined the starting point of the study period as median of the time points where the first GPS fixes were recorded (`r dates_median[1]`). The end of the study period was defined as the median of the time points where the last GPS fixes were recorded (`r dates_median[2]`, figure 3). Thus, the data cover a time period of `r as.numeric(difftime(dates_median[2], dates_median[1]))` days and comprise several campsite locations before and after the winter campsite location, where households stay for a longer time period.
+
+```{r gap-filtering-study-period-plot1, fig.height=4, fig.width=4, out.width= "0.7\\textwidth", fig.align="center", fig.cap=paste0("Density plot for the duration of the longest gap in the trajectory and the proportion of gaps (relative number of days without identified location during the study period) in the preprocessed trajectories computed for each of the ", nrow(d), " Mongolian nomadic households. The vertical dashed line represents the threshold value for the proportion of gaps (30\\,\\%) and the horizontal dashed line the threshold value for the duration of the longest gap (30 days). The blue lines are contour lines for the density of the data points. Note that the density of households below the threshold values indicated by the dashed lines is larger than that of the households not matching these thresholds.\\label{fig:gap_filtering_study_period_plot1}")}
+gap_filtering_density_plot
+```
+
+```{r gap-filtering-study-period-plot2, fig.height=3.5, fig.width=4, out.width= "0.7\\textwidth", fig.align="center", fig.cap=paste0("Cumulative densities for the day where the first location was recorded (first day of the first recorded location, solid line) and the day where the last location was recorded (last day of the last recorded location, dashed line), computed for the ", nrow(d), " Mongolian nomadic households. Vertical dashed lines represent the median value of the days where the first location was recorded and the days where the last location was recorded, respectively, and these values are defined as start and end time points of the study period, respectively. \\label{fig:gap_filtering_study_period_plot2}")}
+dates_study_period_plot
+```
+
+## Computation of Movement Summary Indicators
+
+For each household, we computed the movement summary indicators defined and described in table 1 based on the trajectories of identified campsite locations. The aim was to define a set of movement summary indicators that represent the horizontal and vertical movements, trajectory shape (movement direction, movement direction change, straightness index), inter-campsite location distances, number of campsite locations and visits, and the spatial range covered.
+
+The definition of the straightness index [@Laube.2007] is visualized conceptually in figure 7. It is computed by (1) calculating the sum of the lengths of the individual inter-campsite beeline distances along the trajectory (length of the trajectory) $a$, (2) calculating the beeline distance between the first and last campsite location of the trajectory, $b$, and (3) dividing $a$ by $b$ [@Laube.2007].
+
+The derivation of the trajectory linearity is visualized in figure 8. In order to calculate one value, at least three campsite locations have to be present in a trajectory. The trajectory linearity is computed by (1) computing all pairwise distances between all campsite locations in the trajectory, (2) retaining the maximum distance $a$ and constructing a line $line_a$ between the corresponding two campsite locations, (3) computing the shortest distance between each campsite locations and $line_a$ and (4) recording on which side of the line the campsite locations are placed. (5) If there are only campsite locations on one side of the line, the maximum distance between a campsite location and $line_a$ is recorded as $b$, else the maximum sum of the distances of two campsite locations on different sides of the line to $line_a$ ($b_1$ and $b_2$) is recorded as $b = b_1 + b_2$, and (6) finally, the trajectory linearity is computed as $a/b$.
+
+```{r movement-summary-indicators-definition}
+# definition of the table
+si_definition <- rbind(
+  c("location\\_altitude\\_difference",
+    "The altitude difference between the two campsite locations with the extreme altitude values (minimum, maximum) in a trajectory [m]."),
+  c("total\\_altitude\\_distance",
+    "The sum of the absolute altitude differences (beeline distances) covered along the trajectory, i.e. between following campsite locations [m]."),
+  c("location\\_distance",
+    "The median distance between following campsite locations [m]."),
+  c("total\\_distance",
+    "The total distance covered by a household [m]."),
+  c("longitude\\_difference",
+    "The absolute longitude difference between the two campsite locations with the extreme longitude values (minimum, maximum) in a trajectory [m]."),
+  c("latitude\\_difference",
+    "The absolute latitude difference between the two campsite locations with the extreme longitude values (minimum, maximum) in a trajectory [m]."),
+  c("longitude\\_sum",
+    "The absolute longitude difference between the first and last campsite location in a trajectory [m]."),
+  c("latitude\\_sum",
+    "The absolute latitude difference between the first and last campsite location in a trajectory [m]."),
+  c("chull\\_area",
+    "The area of a convex hull spanned around all campsite locations of a trajectory [m$^2$]."),
+  c("chull\\_perimeter",
+    "The perimeter of a convex hull spanned around all campsite locations of a trajectory [m]."),
+  c("linearity",
+    "An estimate of the trajectory linearity. See figure~8 for a conceptual graphic and the text for more details."),
+  c("straightness\\_index",
+    "The ratio of total\\_distance and the beeline distance between the first and last campsite location in a trajectory (Laube et al., 2007). See figure 7."),
+  c("locations\\_number",
+    "The number of different campsite locations along a trajectory."),
+  c("locations\\_number\\_repeated\\_visits",
+    "The number of repeated visits of all campsite locations along a trajectory.")
+) %>%
+  as.data.frame()
+
+# add an ID for each summary indicator
+si_definition <-
+  cbind(ID = seq_len(nrow(si_definition)),
+        si_definition)
+
+
+# print the table
+si_definition_kable <-
+  kableExtra::kable(si_definition,
+                    row.names = FALSE,
+                    col.names = c("ID", "Summary Indicator", "Definition"),
+                    caption = "Definition of the movement summary indicators. \\label{tab:movement_summary_indicators_definition}",
+                    escape = FALSE,
+                    format = "latex",
+                    booktabs = TRUE,
+                    longtable = TRUE,
+                    align = c(rep("l", 3))) %>%
+  kableExtra::kable_styling(position = "center",
+                            font_size = 7) %>%
+  kableExtra::column_spec(3, width = "23em")
+
+# manually change column specification (seems to be a bug in kableExtra)
+si_definition_kable[[1]] <- stringr::str_remove(si_definition_kable[[1]], ">\\{\\\\raggedright\\\\arraybackslash\\}")
+
+# print the table
+si_definition_kable
+```
+
+## Statistical Analysis
+
+We conducted an explorative analysis to characterize overall patterns in the computed movement summary indicators. Based on this, we tested for distinct clusters of households based on these indicators. Finally, we investigated in more detail the relation between the total distance moved, the number of visited campsite locations, and the median distance between subsequent campsite locations. We created scatterplots and computed a linear regression model that allowed us to quantify how changes in the number of visited campsite locations and the median distance between subsequent campsite locations influence the total distance covered. All computations were conducted in the programming language R [@RCoreTeam.2017] and all plots (except stated differently) were created using the R packages ggplot2 [@Wickham.2016] and cowplot [@Wilke.2018].
+
+### Summary Table
+
+```{r si-overview}
+# thresholds for gaps
+threshold_gap_proportion <- 0.3
+threshold_gap_duration <- 30
+
+# define variables to include
+si_names <- 
+  c("location_altitude_difference", 
+    "total_altitude_distance", 
+    "location_distance", 
+    "total_distance", 
+    "longitude_difference", 
+    "latitude_difference", 
+    "longitude_sum", 
+    "latitude_sum", 
+    "chull_area", 
+    "chull_perimeter", 
+    "locations_number", 
+    "locations_number_repeated_visits", 
+    "straightness_index", 
+    "linearity", 
+    "gaps_proportion")
+
+# define variables to reformat (divide distances by 1000 to get km)
+si_distances <- 
+  c("chull_perimeter", 
+    "latitude_sum", 
+    "longitude_sum", 
+    "latitude_difference", 
+    "longitude_difference", 
+    "location_distance", 
+    "total_distance")
+
+# change units
+si <- 
+  d %>%
+  dplyr::mutate(chull_area = chull_area/1000000) %>%
+  dplyr::mutate_if(colnames(d) %in% si_distances, function(x) x/1000)
+
+# for linearity: set values to NA if only two locations were detected
+si$linearity[si$locations_number == 2] <- NA
+
+# define samples to include
+si_rowindex <- 
+  si$gaps_proportion <= threshold_gap_proportion & 
+  si$gap_duration_max <= threshold_gap_duration
+
+# select the data to summarise
+si_overview <- 
+  si %>%
+  dplyr::filter(si_rowindex) %>%
+  dplyr::select(dplyr::all_of(si_names))
+
+# get the overview table
+si_overview_tab <-
+  si_overview %>%
+  purrr::map_df(herdersmovementpatterns::mp_si_summarise)
+si_overview_tab <- cbind(var = colnames(si_overview), si_overview_tab)
+```
+
+First, we summarized the summary indicators described above by computing their mean, median, minimum, and maximum values. This summary is provided in table 2 to give a detailed overview on typical ranges of the summary indicators for Mongolian nomadic household movements. Note that for the linearity indicator, only households with $\ge 3$ campsite locations were considered. We also summarized the proportion of gaps in the samples in this table.
+
+
+### Correlation Analysis
+
+```{r si-preparation}
+# variables to include in the analysis
+variable_selection <- c("location_altitude_difference",
+                        "total_altitude_distance",
+                        "location_distance",
+                        "total_distance",
+                        "longitude_difference",
+                        "latitude_difference",
+                        "longitude_sum",
+                        "latitude_sum",
+                        "chull_area",
+                        "chull_perimeter",
+                        "linearity",
+                        "straightness_index",
+                        "locations_number", 
+                        "gaps_proportion")
+
+# filter for gaps and select variables
+si <- 
+  si %>%
+  dplyr::select(dplyr::all_of(variable_selection)) %>%
+  dplyr::filter(si_rowindex & locations_number >= 3)
+
+# copy before variable transformations and filtering
+si_copy <- si
+```
+
+```{r si-density-plot}
+# collect variables
+si_density <- 
+  si %>% 
+  dplyr::select(-gaps_proportion) %>%
+  tidyr::gather(key = "parameter", value = "value") %>%
+  dplyr::mutate(parameter = as.factor(parameter))
+
+# plot
+si_density_plot1 <-
+  ggplot(si_density, mapping = aes(x = value)) +
+  facet_wrap(~parameter, scales = "free", ncol = 3) +
+  geom_density() +
+  theme(axis.text.x = element_text(size = 6.5),
+        strip.text.x = element_text(size = 8)) +
+  labs(x = "Value", y = "Density")
+
+# skewed variables
+variable_skewed <-
+  c("chull_area",
+    "chull_perimeter",
+    "location_altitude_difference",
+    "location_distance",
+    "longitude_difference",
+    "latitude_difference",
+    "straightness_index",
+    "total_altitude_distance",
+    "total_distance",
+    "linearity")
+
+# log transformation
+si %<>%
+  dplyr::mutate_if(colnames(si) %in% variable_skewed, log)
+
+# density plot
+si_density <- 
+  si %>% 
+  dplyr::select(-gaps_proportion) %>%
+  tidyr::gather(key = "parameter", value = "value") %>%
+  dplyr::mutate(parameter = as.factor(parameter))
+
+si_density_plot2 <-
+  ggplot(si_density, mapping = aes(x = value)) +
+  facet_wrap(~parameter, scales = "free", ncol = 3) +
+  geom_density() +
+  theme(axis.text.x = element_text(size = 6.5),
+        strip.text.x = element_text(size = 8)) +
+  labs(x = "Value", y = "Density")
+```
+
+```{r si-correlation}
+# correlation analysis
+si_cor_raw <-
+  si %>%
+  dplyr::select(-gaps_proportion) %>%
+  purrr::map(function(x) {
+    purrr::map_dbl(seq_len(ncol(si)), function(i) {
+      cor(x, si[, i, drop = TRUE], method = "pearson", use = "pairwise.complete.obs") %>%
+        round(digits = 2)
+    })
+  }) %>%
+  dplyr::bind_rows()
+ 
+# make absolute values >0.6 bold
+si_cor <- 
+  si_cor_raw %>%
+  purrr::map_df(function(x) {
+  ifelse(abs(x) >= 0.6, paste0("\\textbf{", x, "}"), paste0(x))
+})
+
+# make column and row names for printing 
+rownames(si_cor) <- stringr::str_replace_all(colnames(si), pattern = "\\_", replacement = "\\\\_")
+colnames(si_cor) <- stringr::str_replace_all(colnames(si), pattern = "\\_", replacement = "\\\\_")
+```
+
+Second, we computed the Pearson correlation between the movement summary indicators in order to analyze  their pairwise relation. Samples with $< 3$ campsite locations were excluded. Otherwise, it would not have been possible to include the trajectory linearity as variable in the analysis.
+Summary indicators with highly skewed sample densities were log-transformed prior the analysis (chull_area, chull_perimeter, location_altitude_difference, location_distance, longitude_difference, latitude_diffe-rence, straightness_index, total_altitude_distance, total_distance and linearity; see figure 10).
+
+```{r si-gaps-plot}
+## plot to show the relation between the summary indicators and the proportion of gaps 
+
+# reformat the si for plotting
+si_gaps_long <-
+  si %>%
+  tidyr::pivot_longer(-gaps_proportion,
+                      names_to = "si",
+                      values_to = "value")
+
+# plot
+si_gaps_plot <-
+  ggplot(si_gaps_long,
+         aes(x = gaps_proportion,
+             y = value)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  facet_wrap(~ si, scales = "free_y", ncol = 3) +
+  labs(x = "Gap proportion", y = "Summary indicator value") +
+  theme(axis.text.x = element_text(size = 6.5),
+        strip.text.x = element_text(size = 10))
+```
+
+
+### Principal Component Analysis
+
+Third, we conducted a principal component analysis (PCA) on the movement summary indicators in order to analyze main gradients formed by the households and the multivariate relation between the computed movement summary indicators. For this, the same data as used for the correlation analysis (log-transformation of skewed variables, only households that visited $\ge 3$ campsite locations), but excluding the number of campsite locations, was used. In addition, all summary indicators were z-transformed prior computing the PCA.
+We applied the Kaiser-Guttman criterion [@Jackson.1993] to select the first $n$ principal components (PCs) for interpretation.
+PCs were interpreted by computing the relative importance of each summary indicator variable for the PC, the loadings of the summary indicator variables for the PCs and by creating biplots of the loadings for different combinations of retained PCs.
+The loading values of a variable represent how this variable relates to a PC. Positive loadings of a variable for a PC indicate that positive values of the variable increase the score value of a sample for this PC.
+Gradients along the PCs and potential clustering were assessed by creating biplots of the scores of the PCA for different combinations of retained PCs.
+The PCA was computed using the R package vegan [@Oksanen.2018].
+
+```{r si-pca}
+# data selection
+si_pca_df <- 
+  si %>%
+  dplyr::select(-c(gaps_proportion, locations_number)) %>%
+  purrr::map_df(scale, center = TRUE, scale = TRUE)
+
+# compute the PCA
+si_pca  <- 
+  si_pca_df %>%
+  as.matrix() %>%
+  vegan::rda(scale = FALSE)
+
+# get the eigenvalues
+si_pca_eigenvalues <- 
+  si_pca %>%
+  vegan::eigenvals()
+
+# get the number of all PCs
+si_pca_pc_number <- 
+  si_pca_eigenvalues %>%
+  length()
+
+# mean eigenvalue
+si_pca_eigenvalues_mean <- 
+  si_pca_eigenvalues %>%
+  mean()
+
+# plot
+si_pca_kg_plot <-
+  ggplot() +
+  geom_segment(mapping = aes(x = seq_len(si_pca_pc_number),
+                             xend = seq_len(si_pca_pc_number),
+                             y = 0,
+                             yend = si_pca_eigenvalues)) +
+  geom_hline(yintercept = si_pca_eigenvalues_mean,
+             linetype = 2,
+             colour = "red") +
+  labs(x = "PC", y = "Eigenvalue")
+
+# index of PCs to interpret
+si_pca_pc_index <- which(si_pca_eigenvalues > si_pca_eigenvalues_mean)
+```
+
+```{r si-pca-variable-contribution}
+# extract the loadings
+si_pca_loadings <- 
+  si_pca %>%
+  vegan::scores(choices = si_pca_pc_index,
+                display = "species",
+                scaling = "species")
+
+# compute variable contributions
+si_pca_contribution <-
+  si_pca_loadings %>%
+  mp_si_pca_variable_contribution()
+
+# compute average variable contributions per PC
+si_pca_contribution %<>% 
+  dplyr::group_by(PC) %>%
+  dplyr::summarise(contribution_mean = mean(contribution)) %>%
+  dplyr::right_join(si_pca_contribution, by = "PC")
+
+# detect variabls with a contribution larger than the average contribution
+si_pca_contribution %<>%
+  dplyr::mutate(fill = ifelse(contribution > contribution_mean, "grey", "white")) 
+
+# plot of variable contributions
+si_pca_contribution_plot <-
+  ggplot(si_pca_contribution,
+       mapping = aes(x = variable_name,
+                     y = contribution * 100,
+                     fill = fill)) +
+  geom_col() +
+  geom_hline(aes(yintercept = contribution_mean * 100),
+             linetype = 2,
+             colour = "grey") +
+  coord_flip() +
+  facet_wrap(~PC) +
+  labs(y = "Variable contribution [%]",
+       x = "Summary indicator") +
+  theme(legend.position = "none")
+```
+
+```{r si-pca-variable-loadings}
+# reformat the loadings
+si_pca_loadings_stack <- 
+  si_pca_loadings %>%
+  mp_si_pca_stack_loadings() %>%
+  dplyr::mutate(fill = si_pca_contribution$fill)
+
+# plot
+si_pca_loadings_plot <-
+  ggplot(si_pca_loadings_stack,
+       mapping = aes(x = variable_name,
+                     y = loading,
+                     fill = fill)) +
+  geom_col() +
+  geom_hline(yintercept = 0,
+             linetype = 2,
+             colour = "grey") +
+  coord_flip() +
+  facet_wrap(~PC) +
+  labs(y = "Loading value",
+       x = "Summary indicator") +
+  theme(legend.position = "none")
+```
+
+```{r si-pca-biplot-loadings}
+# prepare the data frame for plotting
+si_pca_loadings_plotdf <- si_pca_loadings
+rownames(si_pca_loadings_plotdf) <- seq_len(nrow(si_pca_loadings_plotdf))
+
+# plot
+si_pca_loadings_biplot <- mp_pca_biplot_variables(si_pca_loadings_plotdf)
+```
+
+```{r si-pca-biplot-scores}
+# extract the scores
+si_pca_scores <- 
+  si_pca %>%
+  vegan::scores(choices = si_pca_pc_index,
+                display = "sites",
+                scaling = "sites")
+
+# data.frame for plotting
+si_pca_scores_plotdf <- si_pca_scores
+
+# plot
+si_pca_scores_biplot <- mp_pca_biplot_scores(si_pca_scores_plotdf)
+```
+
+
+### Hierarchical Cluster Analysis
+
+Third, we computed a hierarchical cluster analysis with the aim to identify distinct groups of households with the same movement characteristics. For this, we used a subset of the movement summary indicators presented above because both the PCA and correlation analysis revealed that several movement summary indicators are correlated and probably indicate similar underlying factors.
+Besides, we used the same observations as included in the PCA, meaning that only households with at least 3 campsite locations were included in the cluster analysis.
+All included variables were z-transformed prior the analysis to give all variables equal weights. We did not log-transform skewed variables to preserve differences at their original scale.
+The Euclidean distance was used as distance measure.
+
+Different hierarchical clustering algorithms exist. Ward's minimum variance clustering (WMVC) is widely used and seeks to partition the data such that the within cluster sum of squared distances are minimized [@Borcard.2011]. Single linkage clustering (SLC) agglomerates groups based on pairwise distances between objects within the clusters. If the pairwise distance between two objects in different clusters with the least distance to each other is the least among different groups, the two groups are merged. This facilitates so-called chaining where individual observations are linked sequentially, thus representing gradients more appropriately [@Borcard.2011]. Complete linkage clustering (CLC) works in the same way as single linkage clustering, but two objects are merged into one cluster if the pairwise distance between two objects in different clusters with the maximum distance to each other is the least among different groups. The consequence is that multiple small groups are formed with more spherical shape in the multivariate space, i.e. (small-scale) discontinuities are pronounced by CLC [@Borcard.2011].
+
+Each clustering algorithm results in a dendrogram representing the relative distances between samples and the stepwise partitioning of the data, where at each step the number of clusters is increased.
+Clustering representativeness for each cluster method was assessed by (1) computing the Pearson correlation between the sample Euclidean distances and the cophenetic distances of the clustering results (cophenetic correlation) and (2) computing average silhouette widths for selected cluster subsets of the computed dendrograms [@Borcard.2011].
+The larger the cophenetic correlation between the cophenetic distances of a dendrogram and the sample Euclidean distances, the larger is the ability of a dendrogram to represent patterns in the data [@Borcard.2011].
+The larger average silhouette width for selected cluster subsets of the computed dendrograms the larger is the similarity of samples within each cluster [@Borcard.2011]. A subset of the clusters provided by each dendrogram was identified by applying partition around medoids (PAM) on the cophenetic distance matrices such that the average silhouette width was maximized [@Maechler.2018]. Thus, computing average silhouette widths also yielded estimates of the number of clusters to interpret [@Maechler.2018].
+Since the cluster results indicated that a gradual description of the movement summary indicators across the sampled households is more appropriate (see section [3.5](#hierarchical-cluster-analysis-1)), we did not interpret the identified clusters.
+Clusters and dendrograms were computed using functions of the R packages stats [@RCoreTeam.2017], cluster [@Maechler.2018] and dendextend [@Galili.2015]. 
+
+```{r si-hca}
+# variables to include in the cluster analysis
+hc_variables <-
+  c("total_distance",
+    "location_distance",
+    "straightness_index",
+    "linearity")
+
+# extract the target variables and z transform
+si_hc <-
+  si_copy %>%
+  dplyr::select(hc_variables) %>%
+  purrr::map_df(scale, center = TRUE, scale = TRUE)
+
+# compute the Euclidean distance matrix
+si_hc_dist <-  
+  si_hc %>%
+  dist(method = "euclidean")
+```
+
+```{r si-hca-ward}
+# Ward's minimum variance clustering
+si_hc_wmvc <- 
+  si_hc_dist %>%
+  hclust(method = "ward.D2")
+
+# cophenetic distance
+si_hc_wmvc_cophenetic <- cophenetic(si_hc_wmvc)
+
+# cophenetic correlation
+si_hc_wmvc_cophenetic_correlation <-
+  cor(y = si_hc_wmvc_cophenetic,
+      x = si_hc_dist,
+      method = "pearson")
+
+# get a dendrogram
+si_hc_wmvc_dend <- as.dendrogram(si_hc_wmvc)
+
+# apply PAM on the cophenetic distances to find the number of clusters maximising the average silhouette width
+si_hc_wmvc_k <- dendextend::find_k(si_hc_wmvc_dend, krange = 1:(nrow(si_hc)-1))
+
+# detect the first three clusters
+si_hc_wmvc_k3 <- dendextend::find_k(si_hc_wmvc_dend, krange = 4)
+```
+
+```{r si-hca-slc}
+# Single linkage clustering
+si_hc_slc <- 
+  si_hc_dist %>%
+  hclust(method = "single")
+
+# cophenetic distance
+si_hc_slc_cophenetic <- cophenetic(si_hc_slc)
+
+# cophenetic correlation
+si_hc_slc_cophenetic_correlation <-
+  cor(y = si_hc_slc_cophenetic,
+      x = si_hc_dist,
+      method = "pearson")
+
+# get a dendrogram
+si_hc_slc_dend <- as.dendrogram(si_hc_slc)
+
+# apply PAM on the cophenetic distances to find the number of clusters maximising the average silhouette width
+si_hc_slc_k <- dendextend::find_k(si_hc_slc_dend, krange = 1:(nrow(si_hc)-1))
+
+# detect the first three clusters
+si_hc_slc_k3 <- dendextend::find_k(si_hc_slc_dend, krange = 4)
+```
+
+
+```{r si-hca-clc}
+# Complete linkage clustering
+si_hc_clc <- 
+  si_hc_dist %>%
+  hclust(method = "complete")
+
+# cophenetic distance
+si_hc_clc_cophenetic <- cophenetic(si_hc_clc)
+
+# cophenetic correlation
+si_hc_clc_cophenetic_correlation <-
+  cor(y = si_hc_clc_cophenetic,
+      x = si_hc_dist,
+      method = "pearson")
+
+# get a dendrogram
+si_hc_clc_dend <- as.dendrogram(si_hc_clc)
+
+# apply PAM on the cophenetic distances to find the number of clusters maximising the average silhouette width
+si_hc_clc_k <- dendextend::find_k(si_hc_clc_dend, krange = 1:(nrow(si_hc)-1))
+
+# detect the first three clusters
+si_hc_clc_k3 <- dendextend::find_k(si_hc_clc_dend, krange = 4)
+```
+
+
+```{r si-hca-cophenetic-dendrogram-plot}
+# plots of the dendrograms for each clustering method
+si_hc_wmvc_dend_plot <- 
+  ggplot(
+    dendextend::as.ggdend(
+      si_hc_wmvc_dend %>% 
+        dendextend::set("branches_lwd", 0.5)), 
+    labels = FALSE)
+si_hc_slc_dend_plot <- 
+  ggplot(
+    dendextend::as.ggdend(
+      si_hc_slc_dend %>% 
+        dendextend::set("branches_lwd", 0.5)), 
+    labels = FALSE)
+si_hc_clc_dend_plot <- 
+  ggplot(
+    dendextend::as.ggdend(
+      si_hc_clc_dend %>% 
+        dendextend::set("branches_lwd", 0.5)), 
+    labels = FALSE)
+
+# plots of the cophenetic distance in dependency of the actual Euclidean distance
+si_hc_wmvc_cophenetic_plot <-
+  ggplot(mapping = aes(x = as.vector(si_hc_wmvc_cophenetic),
+                       y = as.vector(si_hc_dist))) +
+  geom_point() +
+  geom_abline(intercept = 0,
+              slope = 1,
+              colour = "gray",
+              linetype = 2) +
+  labs(y = "Object distance",
+       x = "Cophenetic distance")
+
+si_hc_slc_cophenetic_plot <-
+  ggplot(mapping = aes(x = as.vector(si_hc_slc_cophenetic),
+                       y = as.vector(si_hc_dist))) +
+  geom_point() +
+  geom_abline(intercept = 0,
+              slope = 1,
+              colour = "gray",
+              linetype = 2) +
+  labs(y = "Object distance",
+       x = "Cophenetic distance")
+
+si_hc_clc_cophenetic_plot <-
+  ggplot(mapping = aes(x = as.vector(si_hc_clc_cophenetic),
+                       y = as.vector(si_hc_dist))) +
+  geom_point() +
+  geom_abline(intercept = 0,
+              slope = 1,
+              colour = "gray",
+              linetype = 2) +
+  labs(y = "Object distance",
+       x = "Cophenetic distance")
+
+# total plot
+si_hc_plot <-
+  cowplot::plot_grid(
+    plotlist = 
+      list(
+        si_hc_wmvc_dend_plot, 
+        si_hc_slc_dend_plot, 
+        si_hc_clc_dend_plot,
+        si_hc_wmvc_cophenetic_plot, 
+        si_hc_slc_cophenetic_plot, 
+        si_hc_clc_cophenetic_plot
+      ),
+    ncol = 3, 
+    nrow = 2, 
+    labels = LETTERS[1:6])
+```
+
+
+### Regression Analysis
+
+Since the PCA and hierarchical cluster analysis did not identify a clustered structure of the movement summary indicator data, we used a regression model and scatterplots to describe in more detail the relations between our two target movement summary indicators (the number of visited campsite locations and the median distance between subsequent campsite locations) and the total distance covered. The aim was to identify movement strategies across this gradient and to provide evidence for our hypothesis that different mobility practices of the nomadic herder households are differentiated by the interrelations between these characteristics.
+
+The mobility range, as indicated by the total distance covered, is potentially an important variable for forage and water availability and avoidance of unfavorable climate conditions.
+Theoretically, it is possible for a household to increase the total distance covered by (1) visiting more campsite locations along the way and (2) increasing the distance of individual movements between subsequent campsite locations. Both strategies may be applied simultaneously.
+Making long-distance movements between subsequent campsite locations in comparison to making movements with smaller distances but higher frequency (i.e. having more campsite locations) potentially has implications for the resources spent on movements, the risk of movements, and may be a result of differences in herd size and availability of resources [@Marin.2008].
+The median distance of individual movements between subsequent campsite locations (location_distance) is an indicator for both an increase in the distance of individual movements and an increase *in the frequency* of movements with at least such a distance.
+
+For the regression analysis, we used a generalized linear regression model (GLM) with Gamma distribution to account for the fact that the total distance covered cannot be negative. Both the number of visited campsite locations and the median distance between subsequent campsite locations were log transformed prior the analysis since this reduced non-linear patterns in the residuals. We computed the regression model in R [@RCoreTeam.2017], the variance explained following @Nakagawa.2017 using the package MuMIn [@Barton.2020], confidence intervals using the package MASS [@Venables.2007] and validated the models with residual plots and plots of predicted values using the packages ggplot2 [@Wickham.2016], cowplot [@Wilke.2018], and directlabels [@Hocking.2020].
+
+```{r si-regression}
+# variables to use during modeling
+total_distance_variable_names <- c("total_distance", "locations_number", "location_distance")
+
+# data.frame with the model data
+total_distance_df <-
+  si_copy %>%
+  dplyr::select(total_distance_variable_names) %>%
+  dplyr::mutate(location_distance = log(location_distance),
+                locations_number = log(locations_number))
+
+# model
+total_distance_m1 <- 
+  glm(total_distance ~ locations_number + location_distance, 
+      data = total_distance_df, 
+      family = Gamma(link = "log"))
+
+# explained variance
+total_distance_m1_r2 <- MuMIn::r.squaredGLMM(total_distance_m1)
+
+# predicted values
+total_distance_df$yhat <- fitted(total_distance_m1)
+
+# standardized residuals
+total_distance_df$residuals <- residuals(total_distance_m1, type = "pearson")
+
+# parameter confidence intervals on response scale
+total_distance_m1_ci <- confint(total_distance_m1, level = 0.95)
+
+# validation plots
+
+## fitted ~ measured
+total_distance_m1_y_yhat <-
+  ggplot(total_distance_df, aes(x = total_distance, y = yhat)) +
+  geom_point() +
+  geom_abline(intercept = 0, slope = 1) +
+  coord_fixed() +
+  labs(x = "Measured [km]", y = "Predicted [km]")
+
+## residuals ~ fitted
+total_distance_m1_residuals_yhat <-
+  ggplot(total_distance_df, aes(x = yhat, y = residuals)) +
+  geom_hline(yintercept = 0, linetype = 1, colour = "grey") +
+  geom_point() +
+  labs(x = "Predicted [km]", y = "Pearson residuals")
+
+## residuals ~ locations_number
+total_distance_m1_residuals_ln <-
+  ggplot(total_distance_df, aes(x = locations_number, y = residuals)) +
+  geom_hline(yintercept = 0, linetype = 1, colour = "grey") +
+  geom_point() +
+  labs(x = "log(Number of visited campsite locations)", y = "Pearson residuals")
+
+## residuals ~ location_distance
+total_distance_m1_residuals_ld <-
+  ggplot(total_distance_df, aes(x = location_distance, y = residuals)) +
+  geom_hline(yintercept = 0, linetype = 1, colour = "grey") +
+  geom_point() +
+  labs(x = "log(Median distance between campsite locations [km])", y = "Pearson residuals")
+
+# plots for visualization
+
+## density plot of predicted values
+
+# grid for which to plot predicted contour lines
+d1 <- with(si_copy,
+          expand.grid(list(location_distance = log(seq(0.01,
+                                                       max(location_distance),
+                                                       by = 5)),
+                           locations_number = log(seq(2,
+                                                      max(locations_number),
+                                                      by = 1)))))
+d_fit <- predict(total_distance_m1, newdata = d1, type = "link", se = TRUE)
+
+# arrange the data for plotting
+d1 %<>%
+  dplyr::mutate(Mean = d_fit$fit %>% family(total_distance_m1)$linkinv(),
+                Lower = (d_fit$fit - 2 * d_fit$se.fit) %>% family(total_distance_m1)$linkinv(),
+                Upper = (d_fit$fit + 2 * d_fit$se.fit) %>% family(total_distance_m1)$linkinv()) %>%
+  dplyr::filter(location_distance < 4) %>%
+  tidyr::pivot_longer(-c(locations_number, location_distance),
+                      names_to = "term",
+                      values_to = "value") %>%
+  dplyr::mutate(term = factor(term, levels = c("Lower", "Mean", "Upper")))
+
+# plot
+total_distance_m1_predicted <- 
+  ggplot() +
+  geom_contour(data = d1, aes(y = exp(location_distance),
+                             x = exp(locations_number),
+                             z = value,
+                   colour = ..level..),
+               colour = "grey",
+               breaks = c(10, 20, 40, 70, 100, 150, 200, 300, 400, 500)) +
+  geom_point(data = si_copy[log(si_copy$location_distance) < 4, ],
+             aes(y = location_distance,
+                 x = locations_number,
+                 size = total_distance)) +
+  scale_size(range = c(0, 4)) +
+  facet_wrap(~term) +
+  scale_x_continuous(breaks = c(0, 2, 4, 6, 8, 10, 12, 14),
+                     limits = c(0, 14)) +
+  scale_y_continuous(limits = c(0, 54)) +
+  labs(x = "Number of visited campsite locations",
+       y = "Median distance between locations [km]") +
+  theme(legend.position = "none")
+
+# add contour line labels to the plot
+total_distance_m1_predicted <- 
+  directlabels::direct.label(total_distance_m1_predicted,
+                             method = list("first.points",
+                                           colour = "dimgrey",
+                                           rot = 90,
+                                           vjust = 0,
+                                           hjust = -0.2,
+                                           cex = 0.8))
+```
+
+
+# Results
+
+## GPS Data Quality
+
+The `r nrow(d)` households for which campsite locations could be detected (i.e. prior gap filtering) had an average proportion of gaps of `r round(mean(d$gaps_proportion) * 100, 0)` % (median = `r round(median(d$gaps_proportion) * 100, 0)` %) with a minimum of `r round(min(d$gaps_proportion) * 100, 0)` % and a maximum of `r round(max(d$gaps_proportion) * 100, 0)` % after gap filling.
+The duration of a gap per household was on average `r round(mean(d$gap_duration_mean), 0)` days (median = `r round(median(d$gap_duration_mean), 0)`, minimum = `r round(min(d$gap_duration_mean), 0)` days, maximum = `r round(max(d$gap_duration_mean), 0)` days).
+The number of gaps per household ranged from `r min(d$gap_number)` to `r max(d$gap_number)` and the median was `r median(d$gap_number)`.
+`r sum(si_rowindex)` households fulfilled our data quality criteria and were used in the explorative analysis. For these households, no clear relation between the value of any movement summary indicator and the proportion of gaps was visible, indicating that after filtering, the sample likely is unbiased regarding the values of the summary indicators (figure 9). Note that for the correlation analysis, PCA, and cluster analysis we further restricted this sample to the households with $\ge 3$ campsite locations (n = `r nrow(si)`) because the trajectory linearity could not be computed for households with less than three visited campsite locations.
+
+
+## Movement Summary Indicators
+
+In table 2, we present summary statistics for the computed movement summary indicators for the sampled households. Total beeline movement distances between campsite locations ranged from `r round(si_overview_tab$min[si_overview_tab$var == "total_distance"], 1)` to `r round(si_overview_tab$max[si_overview_tab$var == "total_distance"], 1)` km, median distances between adjacent campsite locations between `r round(si_overview_tab$min[si_overview_tab$var == "location_distance"], 1)` and `r round(si_overview_tab$max[si_overview_tab$var == "location_distance"], 1)` km and the number of campsite locations from `r si_overview_tab$min[si_overview_tab$var == "locations_number"]` to `r si_overview_tab$max[si_overview_tab$var == "locations_number"]`. Using a threshold value of 4 days to differentiate between campsite visits and short-term visits, `r min(d$number_stv[si_rowindex])` to `r max(d$number_stv[si_rowindex])` short-term visits were recorded (median = `r median(d$number_stv[si_rowindex])`, n = `r nrow(d[si_rowindex, ])`) for the households. There were `r min(d$number_ostvl[si_rowindex])` to `r max(d$number_ostvl[si_rowindex])` locations per household for which only short-term visits were recorded (median = `r median(d$number_ostvl[si_rowindex])`, n = `r nrow(d[si_rowindex, ])`).
+Several households had up to `r si_overview_tab$max[si_overview_tab$var == "locations_number_repeated_visits"]` repeated campsite visits at campsite locations.
+
+```{r results-summary-indicator-table}
+# print the table
+si_overview_tab %>%
+  kableExtra::kable(row.names = FALSE,
+                    col.names = c("Summary Indicator", "Mean", "Median", "Min", "Max", "n"),
+                    caption = "Overview of the values of the movement summary indicators and the proportion of days without data values (gaps\\_proportion) for the household sample (gap filled with a threshold of 30 days and filtered with a maximum duration of any gap $\\le 30$~days). Horizontal distances are given in km, chull\\_area in km$^2$ and altitudinal distances in m. \\label{tab:si_overview}",
+                    booktabs = TRUE,
+                    longtable = TRUE) %>%
+  kableExtra::kable_styling(position = "center",
+                            font_size = 7)
+```
+
+
+## Correlation Analysis
+
+All Pearson correlation coefficients are presented in table 3. Many variables are positively related to the total distance covered: the largest pairwise longitudinal and latitudinal distance between campsite locations, the area and perimeter of a convex hull for the campsite locations, the total altitudinal distance covered and also the number of visited locations and median distance between subsequent campsite locations. This indicates that these variables are all indicators of increased mobility in general. Linearity and straightness index were not strongly related to any other movement summary indicator. The number of visited locations was not related to the median distance between subsequent campsite locations (table 3).
+
+
+```{r results-correlation-analysis-table}
+si_cor %>%
+  kableExtra::kable(row.names = TRUE,
+                    format = "latex",
+                    caption = paste0("Pearson correlation coefficients for all pairwise comparisons of the computed movement summary indicators for the ", nrow(si), " Mongolian nomadic households with at least 3 campsite locations. Absolute values $\\ge 0.6$ are given in bold to facilitate visual interpretation. \\label{tab:si_correlation}"),
+                    booktabs = TRUE,
+                    longtable = TRUE,
+                    escape = FALSE) %>%
+  kableExtra::kable_styling(position = "center",
+                            font_size = 8) %>%
+  kableExtra::row_spec(0, angle = -90) %>%
+  kableExtra::landscape()
+```
+
+
+## Principal Component Analysis
+
+The first `r length(si_pca_pc_index)` PCs were selected according to the Kaiser-Guttman criterion for further interpretation. They explain `r mp_number_sequence((si_pca_eigenvalues[si_pca_pc_index]/sum(si_pca_eigenvalues)) * 100, digits = 1)` % of the variance, respectively.
+
+The first PC was related to the total distance the households covered, as indicated by the biplots (figure 4), the relative variable contribution of the total distance covered to the first PC and the corresponding loading value. In addition, biplots, relative variable contributions and loading values also indicate that several of the movement summary indicators are strongly related to the total distance covered (figure 4), in accordance with the correlation analysis (table 3). No variable had positive loadings for the first PC (figure 4).
+
+The second PC was mainly related to the trajectory linearity, altitude distance covered and altitude difference between the lowest and highest campsite location, with households with more linear trajectory covering smaller altitudinal distances and having a smaller maximum altitude distance between campsite locations. However, a scatterplot of both variables did not indicate a negative correlation, but a large variance.
+
+The third PC had largest relative contributions from the net longitudinal and latitudinal movement between the start and end of the study period (figure 4), differentiating households that had a net movement to the north and east from households that had a net movement to the south and west.
+The straightness index is negatively related to the net longitudinal and latitudinal movement.
+A biplot of the first and third PC indicated that the net longitudinal and latitudinal movement were related (Pearson correlation coefficient of log-transformed and z-transformed variables = `r round(cor(si_pca_df$longitude_sum, si_pca_df$latitude_sum), 2)`).
+
+The fourth PC represented a gradient of trajectory linearity and straightness index differentiating households with more linear trajectory and larger straightness index from households with less linear trajectory and straightness index.
+
+The biplots of the scores revealed no clear clustering patterns, except for the combinations of the first and third PC (figure 4). For these two PCs, the biplot shows two clusters that are more differentiated for negative values of PC1 (households covering larger distances) than for positive values (where the clusters overlap at their extremes).  
+
+
+```{r si-pca-plots-preparation, fig.height=12, fig.width=12, out.width="\\textwidth", fig.cap=paste0("Plots for the principal component analysis (PCA) of the movement summary indicators computed for ", nrow(si_pca_df), " Mongolian nomadic households with at least 3 campsite locations. A: Relative variable contribution [\\%] for the first ", length(si_pca_pc_index), " PCs and each included variable. The dashed vertical line represents the average relative variable contribution in each case. Summary indicators contributing more than average to a PC have red filled bars. B: Plot of the loadings for the first ", length(si_pca_pc_index), " PCs. Summary indicators contributing more than average to a PC have red filled bars. C: Biplot of the loadings for all combinations of the first ", length(si_pca_pc_index), " PCs. Numbers refer to movement summary indicator IDs given in table 1. D: Biplot of the scores for all combinations of the first ", length(si_pca_pc_index), " PCs.")}
+# compose all plots for the PCA
+si_pca_plots <- cowplot::plot_grid(
+  plotlist = 
+    list(si_pca_contribution_plot,
+         si_pca_loadings_plot,
+         si_pca_loadings_biplot,
+         si_pca_scores_biplot),
+  labels = LETTERS[1:4]
+)
+
+# export as pdf (for manual adjustments due to aesthetic reasons)
+ggplot2::ggsave("./../figures/si_pca_plots_raw.pdf", plot = si_pca_plots)
+
+# import the reworked graph
+knitr::include_graphics("./../figures/si_pca_plots_derived.pdf")
+```
+
+
+## Hierarchical Cluster Analysis
+
+Cophenetic correlations of `r mp_number_sequence(c(si_hc_wmvc_cophenetic_correlation, si_hc_slc_cophenetic_correlation, si_hc_clc_cophenetic_correlation), digits = 2)` for WMVC, SLC and CLC, respectively, indicated that SLC represents the original distance matrix best (figure 5).
+The PAM-derived average silhouette widths derived from PAM applied on the cophenetic distances also indicated that the SLC maximizes the within cluster similarity: The average silhouette widths were `r mp_number_sequence(c(max(si_hc_wmvc_k$crit), max(si_hc_slc_k$crit), max(si_hc_clc_k$crit)), 2)` for the WMVC, SLC and CLC, respectively.
+For SLC, the dendrogram showed chaining effects (figure 5). The number of clusters maximizing the average silhouette width was `r mp_number_sequence(c(si_hc_wmvc_k$k, si_hc_slc_k$k, si_hc_clc_k$k))` for the WMVC, SLC and CLC, respectively, with ranges of cluster sizes of `r min(table(si_hc_wmvc_k$pamobject$clustering))` to `r max(table(si_hc_wmvc_k$pamobject$clustering))`, `r min(table(si_hc_slc_k$pamobject$clustering))` to `r max(table(si_hc_slc_k$pamobject$clustering))` and `r min(table(si_hc_clc_k$pamobject$clustering))` to `r max(table(si_hc_clc_k$pamobject$clustering))`.
+Altogether, these results indicate that the sampled households represent a gradient of the movement summary indicators and do not form distinct groups.
+
+
+```{r si-hc-plots, fig.height=9, fig.width=12, out.width = "\\textwidth", fig.cap=paste0("Plots for the hierarchical cluster analysis of the movement summary indicators computed for ", nrow(si), " Mongolian nomadic households with at least 3 campsite locations using three different clustering algorithms (Ward's minimum variance clustering (WMVC): left column, Single linkage clustering (SLC): middle column, Complete linkage clustering (CLC): right row). Upper row: Dendrograms. Lower row: Plots of the Euclidean distance between households based on their movement summary indicators in dependency of the cophenetic distances derived from the clustering results. The dashed line represents the case where the cophenetic distance and the Euclidean distance are identical.")}
+si_hc_plot
+```
+
+
+## Regression Analysis
+
+According to the regression model, the total distance covered by a household within the study period is positively related to both the number of visited campsite locations (95 %-confidence interval on the link scale: [`r round(total_distance_m1_ci[rownames(total_distance_m1_ci) == "locations_number", 1], 2)`; `r round(total_distance_m1_ci[rownames(total_distance_m1_ci) == "locations_number", 2], 2)`]) and the median distance between subsequent campsite locations (95 %-confidence interval on the link scale: [`r round(exp(total_distance_m1_ci[rownames(total_distance_m1_ci) == "location_distance", 1]), 2)`; `r round(exp(total_distance_m1_ci[rownames(total_distance_m1_ci) == "location_distance", 2]), 2)`]) (figure 6):
+
+A household with four campsite locations, and a median distance between subsequent campsite locations of 10 km (that covers a distance of `r round(predict(total_distance_m1, newdata = data.frame(locations_number = log(4), location_distance = log(10)), type = "response"), 0)` km according to the model) that would visit one more campsite location would increase its total distance covered on average by `r round(predict(total_distance_m1, newdata = data.frame(locations_number = log(5), location_distance = log(10)), type = "response") - predict(total_distance_m1, newdata = data.frame(locations_number = log(4), location_distance = log(10)), type = "response"), digits = 0)` km.
+If the same household would increase the median distance between subsequent campsite locations by 1 km, it would increase its total distance covered on average by `r round(predict(total_distance_m1, newdata = data.frame(locations_number = log(4), location_distance = log(11)), type = "response") - predict(total_distance_m1, newdata = data.frame(locations_number = log(4), location_distance = log(10)), type = "response"), digits = 0)` km.
+The model underestimated the total distance covered by one household that apparently made one or few movements over a large distance since it visited both a non-extreme number of campsite locations and had an extreme median distance between subsequent campsite locations (figure 11). Overall, the model explained around `r round(total_distance_m1_r2[1, 1]*100, 0)` % of the variance.
+
+A Scatterplot relating the total distance covered to the median distance between subsequent campsite locations, and the number of visited campsite locations reveals that these three movement indicators interrelate gradually (figure 6). This gradient has three conceptual extrema (figure 6): The first extremum are households that covered a relatively small total distance, visited only few campsite locations and had a relatively small distance between subsequent campsite locations. The two other extrema are formed by two distinct groups of households covering a total distance of approximately $\ge170$ km, besides the bulk of the sampled households covering total distances of approximately $<170$ km (figure 6):
+Households representing the second extremum have a median distance between subsequent campsite locations corresponding roughly to the average of the median distances between subsequent campsite locations of the bulk of the sampled households (`r round(mean(si_copy$location_distance), 0)` km), but visited a relatively large number of campsite locations (`r min(si_copy$locations_number[si_copy$location_distance < 20 & si_copy$total_distance >= 170])` to `r max(si_copy$locations_number[si_copy$location_distance < 20 & si_copy$total_distance >= 170])`).
+Households representing the third extremum visited a relatively small number of campsite locations (`r min(si_copy$locations_number[si_copy$location_distance > 20 & si_copy$total_distance >= 170])` to `r max(si_copy$locations_number[si_copy$location_distance > 20 & si_copy$total_distance >= 170])`), but had a larger median of the median distances between subsequent campsite locations than all remaining households (`r round(median(si_copy$location_distance[si_copy$location_distance > 20 & si_copy$total_distance >= 170]), 0)` km).
+For the bulk of the sampled households, there exists a gradient in the total distance covered that can be explained by both the number of visited campsite locations and the median distance between subsequent campsite locations (figure 6).
+
+```{r regression-plots1, fig.height=4, fig.width=8, out.width="\\textwidth", fig.cap=paste0("Contour plot of the predicted values for the total distance covered in dependency of the number of visited campsite locations and the median distance between subsequent campsite locations [km]. The first and last column contain the lower and upper 95 \\% confidence intervals, respectively, and the middle column the predicted mean value. Different lines and their labels indicate different levels of the predicted total distance [km]. Points represent non-modeled data points and are scaled relative to the unpredicted total distances covered. One extreme observation (median distance between subsequent locations: ", round(exp(max(total_distance_df$location_distance)), 0), " km, number of locations: ", exp(total_distance_df$locations_number)[which.max(total_distance_df$location_distance)], ", total distance covered: ", round(total_distance_df$total_distance[which.max(total_distance_df$location_distance)], 0), " km) has been removed from the plot to facilitate visual differentiaion of the remaining observations.")}
+total_distance_m1_predicted
+```
+
+
+# Discussion
+
+## Nomadic Movement Strategies
+
+### Three Strategies of Nomadic Movement
+
+The main conclusion of the PCA and HCA concerning movement strategies of households is that households gradually vary with respect to their mobility range, i.e. the total distance covered.
+The linear regression analysis provided more insight into how different movement strategies enable different households to increase their total distance covered. Along this gradient, three extreme movement strategies can be characterized (figure 6):
+First, there are households visiting few campsite locations and having a low median distance between subsequent campsite locations, and consequently a small total distance covered.
+Second, there are households visiting a large number of campsite locations, but having  average median distances between subsequent campsite locations.
+Third, there are households visiting an average number of campsite locations, but having clearly above-average median distances between subsequent campsite locations. These households more frequently make long-distance movements between subsequent campsite locations.
+It is important to note that our data suggests that households vary gradually in how they adopt these movement strategies. There exist no distinct clusters based only on these three strategies.
+
+Whilst it is generally not surprising that households cover differing distances and that the three described movement strategies exist, we emphasize on the importance of quantitatively confirming these findings and providing means of measuring a household's mobility range and its movement strategy. %, which is of great relevance for nomad's livelihoods in general:
+Mobility is what differentiates nomads from settled pastorals. Mobility guarantees access to a larger amount of resources (water and forage) for the livestock and thus enables households to possess larger herds and to better cope or adapt to weather extremes [@FernandezGimenez.2015].
+
+@FernandezGimenez.2015 identified mobility as one of the most important factors for Mongolian herders to cope with extreme winter conditions.
+The number of visited campsite locations is related to the pasture area a household's herd can use. Hence, increasing the number of visited campsite locations allows a household to use more resources than a household with fewer pastures under the same environmental conditions. Conversely, a household with a larger herd may have to move more frequently in order to provide enough forage for the livestock.
+
+The median distance between subsequent campsite locations does not only denote a kind of average distance covered during individual movements, but also comprises information on the relative frequency of movements of this distance per household. Households with a larger median distance between subsequent campsite locations typically cover distances of at least this distance, i.e. in approximately 50 % of the individual movements. Typically larger distances per individual movement may be a consequence of missing access to nearby pastures (e.g. because of other herders having a campsite location in this area, or because of unfavorable pasture conditions) or socioeconomic reasons (see below). The first case expresses a strategy to increase resource use in contrast to not moving or moving to pastures with less resources available.
+
+@Marin.2008 points out the importance of the costs of moving. Movement-related issues (long distances to cover, petrol prices) were considered as very important by interviewed herders [@Marin.2008]. Households covering larger total distances have to spend more resources on movement than households covering smaller total distances.
+
+Synthesized, this shows that mobility is fundamental for Mongolian nomadic households to sustain their livelihood, by resulting in a trade-off between both access to resources and transportation costs, and to be able to cope with weather extremes.
+Different movement strategies are likely to result in different resource use efficiencies under different environmental (e.g. forage availability in dependency of the landscape type) and socioeconomic (e.g. access to means of transport) conditions.
+
+Our findings show that GPS-based studies represent a framework to capture and quantitatively measure these different movement strategies of nomadic herders. Such a framework is needed for a deeper understanding of how nomadic movement relates to environmental  and socioeconomic conditions.
+
+
+## Comparison to Qualitative Studies
+
+### Reported ranges for the total distance covered and the number of visited campsite locations
+
+Any comparisons with existing studies on Mongolian nomadic movement must be treated cautiously:
+First, existing studies use qualitative methods and detailed information on data collection (e.g. sample sizes) are often not available.
+Second, most existing studies were conducted prior 1990, the year Mongolia became a democracy and free-market economy [@FernandezGimenez.2015]. Afterwards, movement patterns, such as the total distance covered, most likely changed due to a privatization of the herding economy and increased access to means of transportation [@FernandezGimenez.2006, @Marin.2008]. @Jagvaral.1975 and @Batnasan.1978 reported on movement patterns of Mongolian nomads during the Soviet time. We found only one study reporting on Mongolian herders' movement patterns based on data collected after 1990 [@Ganbold.2015].
+Third, since movement patterns are heterogeneous and extreme values of certain movement summary indicators have a low density, studies with low sample sizes are likely to miss extreme values.
+Consequently it is not possible to attribute differences to either societal, technological or sampling issues. Nevertheless, it is important for future research to set our data in the context of existing studies.
+
+The ranges of the mobility range roughly agree with the values reported qualitatively in previous studies [@Jagvaral.1975, @Batnasan.1978,  @Ganbold.2015]. However, there are also some differences:
+`r sum(si_copy$total_distance > 200)` and `r sum(si_copy$total_distance > 300)` out of the `r nrow(si_copy)` analyzed households had a total distance covered $>200$ km and $>300$ km, respectively, in contrast to the upper bounds of 100, 200 and 300 km given by @Jagvaral.1975, @Ganbold.2015 and @Batnasan.1978, respectively.
+@Jagvaral.1975 found that some households had up to 20 campsite locations, whereas we detected with our approach at maximum `r max(si_copy$locations_number)` campsite locations.
+Any household with $\ge10$ campsite locations in the sample covered at least `r floor(min(si_copy$total_distance[si_copy$locations_number > 10]))` km, in contrast to the 50 to 100 km reported by @Jagvaral.1975.
+@Ganbold.2015 reported movement ranges of 40 to 200 km and 4 to 8 visited campsite locations. Thus, the range of total distances covered reported by @Ganbold.2015 is narrower than the values we found. The same is true for the number of campsite locations.
+
+Given that we ensured a high quality of the analyzed data via conservative gap filling and data filtering and that we certainly underestimated the actual distance covered during movement (by discarding short term visits and measuring only beeline distance), we assume two possible reasons for this.  Either Mongolian herders nowadays cover larger distances in comparison to Soviet times (e.g. because more households move by truck or car instead of walking), or the qualitative studies underestimated the distance covered.
+
+### Categorizing households based on movement characteristics
+
+Qualitative studies often tried to categorize the mobility range and number of campsite locations based on distinct movement characteristics, geographical regions or landscape types [@Simukov.1934, @Tsevel.1934, @Jagvaral.1975, @Batnasan.1978, @Ganbold.2015]. Our analyses could not confirm the presence of distinct clusters based solely on movement summary indicators, but instead indicate gradual variations between the three identified extreme movement strategies. This is in contrast to [@Batnasan.1978] who proposed a classification as short distance or long distance movement, based on the total distance covered.
+While we did not analyze the relation of movement patterns to different land cover types or geographic regions, we argue that classifications of movement patterns according to geographic regions or landcover type are only a first attempt to understand the  movement of nomadic households.
+
+Instead, we suggest that GPS based studies of trajectories make it possible to directly analyze the relation between movement characteristics and movement strategies on the one side and environmental and socioeconomic conditions on the other side as gradients. Such an approach has the potential to: (1) yield deeper insights into how environmental conditions and socioeconomic data shape nomadic household trajectories (for example how local long-term patterns in snow depth affect the selection of campsite locations), (2) yield deeper insights into if and how households with different movement strategies cope/adapt differently with/to extreme weather events, such as dzuds and (3) investigate how changes in climate conditions and socioeconomic conditions may affect the livelihood of nomadic households (e.g. changes in future forage availability). To summarize, we suggest that GPS-based studies on nomadic movement have the potential to give new insights into socioeconomic relevant mechanisms if intersected with environmental and socioeconomic data.
+
+
+## GPS Data Quality and Drawbacks of the Presented GPS-Based Approach
+
+During this study, the GPS loggers were attached to the main pole of the ger of the herders. An observation made by the field team when recollecting GPS loggers at the end of the study period was that they were often switched off or ran out of power during movement.
+This affects the data analysis in two ways. First, only beeline distances between campsite locations could be measured, but the actual trajectory in-between campsite locations is unknown. Second, exact dates of arrivals and departures are unknown because information on when GPS loggers were switched off or ran out of power and were again switched on are not available.
+Apart from this, the data give reliable information on the position of a household on almost daily basis, enabling to quantitatively study nomadic movement with high temporal resolution.
+In particular, scatterplots of the values of the computed movement summary indicators in dependency of the proportion of gaps in the trajectory data after preprocessing and filtering (figure 9) did not show clear patterns or trends, indicating that the data are unbiased after preprocessing and filtering. This shows that the approach is likely suitable to generate unbiased information on nomadic movements.
+
+Despite these promising results, it is important to note that only around `r round(nrow(si_overview)/400 *100, 0)` % of the expected data (`r nrow(si_overview)` out of 400 initial households) could be used during our analysis. GPS loggers could not be retrieved or did not contain any data for `r round((400 - nrow(d))/400 * 100, 0)` % (`r 400 - nrow(d)`) of the households and about half of the households (`r nrow(d) - nrow(si_overview)`) for which data could be retrieved did not fulfill our thresholds of at most 30 % of gaps and no gap with a duration longer than 30 days. We therefore recommend that future studies should expect a data loss of approximately two thirds if GPS data are recorded over a period of nearly one year and if a similar study period length is targeted. For analyses targeting shorter time periods data losses may be slightly lower.
+
+
+# Conclusions
+
+Our findings show that studies using movement summary indicators derived from GPS data present a suitable framework to quantitatively analyze different mobility strategies of nomadic herders. With respect to the movement of Mongolian herders, the results of the quantitative analysis imply that:
+While there is a clear gradient in the mobility range of the sampled households, it is difficult to categorize them into groups characterized by distinct movement summary indicators alone.
+Instead, there exists a continuous field of movement strategies with respect to mobility range and the three extreme movement strategies described in this study.
+Potential reasons for this are that movement strategies may be highly adapted to environmental and socioeconomic conditions individual households face. A combined analysis using additional data describing these conditions as well as the movement summary indicators proposed in this study may provide new insights into the adaption strategies of Mongolian households and allow for assumptions on how they will be impacted by changing climate conditions.
+
+
+# Acknowledgements
+
+The research and data on which this study is based were generously funded by Volkswagen Stiftung, funding initiative "Between Europe and the Orient", research grant 88498. Kati Kraehnert was affiliated with the German Institute for Economic Research while major parts of the research presented here were conducted. Myagmartseren Purevtseren and Munkhnaran Sugar were supported in 2019-2020 by the Asia Research Center, National University of Mongolia - Korea Foundation for Advanced Studies (ARC-KFAS), project number P2019-3743.
+
+# References {#references .unnumbered}
+
+<div id="refs"></div>  
+
+\clearpage
+
+\appendix
+
+# Definition of Movement Summary Indicators
+
+```{r appendix-definition-straightness-index, out.width="0.65\\textwidth", fig.cap="Conceptual representation of the definition of the straightness index Laube et al. 2007. Points represent campsite locations in each panel. A: A sample trajectory. B: The straightness index is computed by (1) drawing a line between the start and end point of the trajectory (dashed line) and (2) dividing the length of the trajectory ($a$) by the length of the line between the start and end point of the trajectory ($b$)."}
+knitr::include_graphics("./../figures/si_definition_straighntess_index.pdf")
+```
+
+```{r appendix-definition-linearity, out.width="0.65\\textwidth", fig.cap="Conceptual representation of the definition of the linearity of a trajectory and how it is estimated. Points represent campsite locations in each panel. A: A sample trajectory. B: As first step, the pairwise distances between all campsite locations are computed (represented as dashed lines) and the maximum distance line (red) is kept and its length a is recorded. C: As second step, the shortest distances of all campsite locations to the kept line are computed and it is recorded for each campsite location, on which side of the line it is. If all campsite locations are on the same side of the line, the maximum distance is recorded and linearity is computed as the ratio of this distance and $a$. If there are campsite locations on both sides of the line, the maximum sum of two distances of campsite locations on different sides of the line are recorded ($b = b_1 + b_2$, red) and linearity is computed as $b/a$."}
+knitr::include_graphics("./../figures/si_definition_linearity_tot.pdf")
+```
+
+
+# Scatterplots of all Movement Summary Indicators in Dependency of the Proportion of Gaps in the Trajectory Data after Preprocessing and Filtering
+
+```{r appendix-si-gaps-plot, fig.height=11, fig.width=7, out.width= "0.75\\textwidth", fig.align="center", fig.cap=paste0("Scatterplots of the values of each summary indicator in dependency of the proportion of gaps in the trajectory data for each of the ", nrow(si), " households with a maximum proportion of missing values of 30 \\% and a maximum duration of any gap of 30 days.")}
+si_gaps_plot
+```
+
+
+# Density Plots of Skewed Movement Summary Indicator Variables Before and After Transformation
+
+```{r appendix-si-density-plot, fig.height=12, fig.width=7, out.width= "0.75\\textwidth", fig.align="center", fig.cap=paste0("Density plots of movement summary indicator variables for the sampled Mongolian households with at least 3 campsite locations and skewed variables (chull\\_area, chull\\_perimeter, location\\_altitude\\_difference, location\\_distance, longitude\\_difference, latitude\\_difference, straightness\\_index, total\\_altitude\\_distance, total\\_distance and linearity) before (A) and after (B) log transformation.")}
+cowplot::plot_grid(plotlist = 
+                     list(si_density_plot1,
+                          si_density_plot2),
+                   ncol = 1,
+                   labels = LETTERS[1:2],
+                   align = "hv")
+```
+
+
+# Validation Plots for the Linear Regression Model
+
+
+```{r regression-total-distance-validation, fig.height=7, fig.width=10, out.width= "0.8\\textwidth", fig.align="center", fig.cap=paste0("Validation plots for the regression model describing the total distance covered in dependency of the number of visited campsite locations and the median distance between subsequent campsite locations. A: Predicted values in dependency of measured values. Note that the axes are scaled equally. B: Residuals in dependency of predicted values. C: Residuals in dependency of the logarithmic number of visited campsite locations. D: Residuals in dependency of the logarithmic median distance between subsequent campsite locations.")}
+cowplot::plot_grid(
+  plotlist = 
+    list(total_distance_m1_y_yhat, 
+         total_distance_m1_residuals_yhat, 
+         total_distance_m1_residuals_ln, 
+         total_distance_m1_residuals_ld),
+  ncol = 2,
+  labels = LETTERS[1:4])
+```
