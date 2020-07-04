@@ -670,7 +670,7 @@ si_pca_scores_biplot <- mp_pca_biplot_scores(si_pca_scores_plotdf)
 
 ### Hierarchical Cluster Analysis
 
-Third, we computed a hierarchical cluster analysis with the aim to identify distinct groups of households with the same movement characteristics. For this, we used a subset of the movement summary indicators presented above because both the PCA and correlation analysis revealed that several movement summary indicators are correlated and probably indicate similar underlying factors.
+Next, we computed a hierarchical cluster analysis with the aim to identify distinct groups of households with the same movement characteristics. For this, we used a subset of the movement summary indicators presented above because both the PCA and correlation analysis revealed that several movement summary indicators are correlated and probably indicate similar underlying factors.
 Besides, we used the same observations as included in the PCA, meaning that only households with at least 3 campsite locations were included in the cluster analysis.
 All included variables were z-transformed prior the analysis to give all variables equal weights. We did not log-transform skewed variables to preserve differences at their original scale.
 The Euclidean distance was used as distance measure.
@@ -1169,12 +1169,15 @@ Despite these promising results, it is important to note that only around `r rou
 Our findings show that studies using movement summary indicators derived from GPS data present a suitable framework to quantitatively analyze different mobility strategies of nomadic herders. With respect to the movement of Mongolian herders, the results of the quantitative analysis imply that:
 While there is a clear gradient in the mobility range of the sampled households, it is difficult to categorize them into groups characterized by distinct movement summary indicators alone.
 Instead, there exists a continuous field of movement strategies with respect to mobility range and the three extreme movement strategies described in this study.
-Potential reasons for this are that movement strategies may be highly adapted to environmental and socioeconomic conditions individual households face. A combined analysis using additional data describing these conditions as well as the movement summary indicators proposed in this study may provide new insights into the adaption strategies of Mongolian households and allow for assumptions on how they will be impacted by changing climate conditions.
+Potential reasons for this are that movement strategies may be highly adapted to environmental and socioeconomic conditions individual households face. A combined analysis using additional data describing these conditions as well as the movement summary indicators proposed in this study may provide new insights into the adaption strategies of Mongolian households and allow for assumptions on how they will be impacted by changing climate conditions. This article and the summary indicator data are also available as reproducible script in the research compendium [@Marwick.2019] ”herdersmovementpatterns” (available at https://github.com/henningte/herdersmovementpatterns, release v1.0.0).
 
+# Declaration of Competing Interest 
+
+The authors declare that they have no known competing finan-cial interests or personal relationships that could have appeared toinfluence the work reported in this paper
 
 # Acknowledgements
 
-The research and data on which this study is based were generously funded by Volkswagen Stiftung, funding initiative "Between Europe and the Orient", research grant 88498. Kati Kraehnert was affiliated with the German Institute for Economic Research while major parts of the research presented here were conducted. Myagmartseren Purevtseren and Munkhnaran Sugar were supported in 2019-2020 by the Asia Research Center, National University of Mongolia - Korea Foundation for Advanced Studies (ARC-KFAS), project number P2019-3743.
+The research and data on which this study is based were generouslyfunded by Volkswagen Stiftung, Germany, funding initiative ‘‘BetweenEurope and the Orient’’, research grant 88498. Kati Kraehnert wasaffiliated with the German Institute for Economic Research while majorparts of the research presented here were conducted. MyagmartserenPurevtseren and Munkhnaran Sugar were supported in 2019–2020 bythe Asia Research Center, National University of Mongolia — KoreaFoundation for Advanced Studies (ARC-KFAS), project number P2019-3743. We thank the anonymous reviewers for their comments whichgreatly improved the manuscript
 
 # References {#references .unnumbered}
 
