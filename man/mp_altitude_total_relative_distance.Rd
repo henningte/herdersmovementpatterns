@@ -16,7 +16,7 @@ a numeric value representing the total altitude distance covered by
 }
 \description{
 \code{mp_altitude_total_relative_distance} computes the total altitude distance
-covered by a \code{\link[trajectories:Track-class]{Track}} (sum of absolute altitude
+covered by a \code{Track} (sum of absolute altitude
 distances) divided by the total horizontal distance covered by the same track.
 }
 \examples{

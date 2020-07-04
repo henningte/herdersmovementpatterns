@@ -16,8 +16,7 @@ a numeric value representing the straightness index for
 }
 \description{
 \code{mp_straightness_index} computes the straightness index
-\insertCite{Laube.2007}{herdersmovementpatterns} for the
-trajectory between the first and last locations of a
+\insertCite{Laube.2007}{herdersmovementpatterns} for the trajectory between the first and last locations of a
 \code{Track} object in the order of movement.
 }
 \examples{
@@ -25,7 +24,4 @@ trajectory between the first and last locations of a
 }
 \references{
 \insertAllCited{}
-}
-\seealso{
-.
 }

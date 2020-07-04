@@ -25,8 +25,8 @@ A list with one \code{{TracksCollection}} for each row in \code{d}
 representinga clipped form of \code{tc}.
 }
 \description{
-\code{tc_clip} clips the \code{\link[trajectories:Track-class]{Track}} objects of
-a \code{\link[trajectories:Track-class]{TracksCollection}} object for
+\code{tc_clip} clips the \code{Track} objects of
+a \code{TracksCollection} object for
 specified time windows.
 }
 \examples{

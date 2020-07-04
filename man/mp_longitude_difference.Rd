@@ -16,7 +16,7 @@ most western and most eastern points in \code{t}.
 \description{
 \code{mp_longitude_difference} computes the longitude difference between
 the most western and most eastern points of a
-\code{\link[trajectories:Track-class]{Track}}.
+\code{Track}.
 }
 \examples{
 #

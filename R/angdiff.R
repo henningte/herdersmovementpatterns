@@ -1,6 +1,3 @@
-#' @importFrom Rdpack reprompt
-NULL
-
 #' Computes differences between two angles
 #'
 #' \code{angdiff} computes the difference between two angles.
@@ -12,7 +9,8 @@ NULL
 #' @seealso .
 #' @examples #
 #' @export
-angdiff <- function(x, y){
+angdiff <- function(x,
+                    y) {
 
   phi <- abs(x - y) %% 360
   ifelse(phi > 180, 360 - phi, phi)

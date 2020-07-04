@@ -1,11 +1,7 @@
-#' @importFrom Rdpack reprompt
-#' @importFrom trajectories Track
-NULL
-
 #' Extracts the altitude range from a Track object.
 #'
 #' \code{mp_altitude_range} extracts the altitude range
-#' \code{\link[trajectories:Track-class]{Track}} object with a variable
+#' \code{Track} object with a variable
 #' \code{altitude} in the data slot. \code{NA}s are removed.
 #'
 #' @param t An object of class \code{\link[trajectories:Track-class]{Track}}
@@ -15,7 +11,7 @@ NULL
 #' @seealso .
 #' @examples #
 #' @export
-mp_altitude_range <- function(t){
+mp_altitude_range <- function(t) {
 
   # checks
   if(!(inherits(t, "Track"))) {

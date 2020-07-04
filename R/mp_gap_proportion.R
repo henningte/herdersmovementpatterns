@@ -1,11 +1,7 @@
-#' @importFrom Rdpack reprompt
-#' @importFrom trajectories Track
-NULL
-
 #' Computes the proportion of gaps in a Track object.
 #'
 #' \code{mp_gap_proportion} computes the proportion of gaps in a
-#' \code{\link[trajectories:Track-class]{Track}}.
+#' \code{Track}.
 #'
 #' @param t An object of class \code{\link[trajectories:Track-class]{Track}}
 #' with a variable \code{location}.
@@ -14,7 +10,7 @@ NULL
 #' @seealso .
 #' @examples #
 #' @export
-mp_gap_proportion <- function(t){
+mp_gap_proportion <- function(t) {
 
   # checks
   if(!(inherits(t, "Track"))) {

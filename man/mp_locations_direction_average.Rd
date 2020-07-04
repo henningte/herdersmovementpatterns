@@ -19,7 +19,7 @@ locations in \code{t} in the order of movement.
 }
 \description{
 \code{mp_locations_direction_average} computes the average direction between
-locations of a \code{\link[trajectories:Track-class]{Track}} in the order of movement.
+locations of a \code{Track} in the order of movement.
 Directions are computed as angle difference between the previous campsite location
 and the current campsite location and the next campsite location and the current
 campsite location. Several options are available.

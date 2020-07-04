@@ -1,12 +1,7 @@
-#' @importFrom Rdpack reprompt
-#' @importFrom trajectories Track
-#' @importFrom spacetime STIDF
-NULL
-
 #' Computes the sum of the longitude transitions of a Track object.
 #'
 #' \code{mp_longitude_sum} sums the longitude differences between adjacent campsite
-#' locations for a \code{\link[trajectories:Track-class]{Track}}.
+#' locations for a \code{Track}.
 #'
 #' @param t An object of class \code{\link[trajectories:Track-class]{Track}}
 #' with a variable \code{location} and \code{campsite} in the data slot.
@@ -15,7 +10,7 @@ NULL
 #' @seealso .
 #' @examples #
 #' @export
-mp_longitude_sum <- function(t){
+mp_longitude_sum <- function(t) {
 
   # checks
   if(!(inherits(t, "Track"))) {

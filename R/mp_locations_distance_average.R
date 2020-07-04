@@ -1,12 +1,7 @@
-#' @importFrom Rdpack reprompt
-#' @importFrom trajectories Track
-#' @importFrom spacetime STIDF
-NULL
-
 #' Computes the mean distance between campsite locations of a Track object in the order of movement.
 #'
 #' \code{mp_locations_distance_average} computes the mean distance between
-#' locations of a \code{\link[trajectories:Track-class]{Track}} in the order of movement.
+#' locations of a \code{Track} in the order of movement.
 #' Several options are available.
 #'
 #' @param t An object of class \code{\link[trajectories:Track-class]{Track}}
@@ -18,7 +13,8 @@ NULL
 #' @seealso .
 #' @examples #
 #' @export
-mp_locations_distance_average <- function(t, fun = stats::median){
+mp_locations_distance_average <- function(t,
+                                          fun = stats::median) {
 
   # checks
   if(!(inherits(t, "Track"))) {

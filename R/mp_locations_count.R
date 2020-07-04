@@ -1,11 +1,7 @@
-#' @importFrom Rdpack reprompt
-#' @importFrom trajectories Track
-NULL
-
 #' Counts unique locations of a Track object.
 #'
 #' \code{mp_locations_count} counts unique lcoations of a
-#' \code{\link[trajectories:Track-class]{Track}}. Several options are available.
+#' \code{Track}. Several options are available.
 #'
 #' @param t An object of class \code{\link[trajectories:Track-class]{Track}}
 #' with a variable \code{location}, \code{campsite} and \code{norepeatedcampsitevisits}.
@@ -20,7 +16,9 @@ NULL
 #' @seealso .
 #' @examples #
 #' @export
-mp_locations_count <- function(t, campsite = TRUE, repeated = FALSE){
+mp_locations_count <- function(t,
+                               campsite = TRUE,
+                               repeated = FALSE) {
 
   # checks
   if(!(inherits(t, "Track"))) {
@@ -71,7 +69,5 @@ mp_locations_count <- function(t, campsite = TRUE, repeated = FALSE){
     sum(sapply(sel, function(x) x > 1))
 
   }
-
-
 
 }

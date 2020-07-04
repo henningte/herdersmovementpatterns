@@ -1,23 +1,16 @@
-#' @importFrom Rdpack reprompt
-#' @importFrom trajectories Track
-#' @importFrom sp SpatialPolygons Polygons Polygon proj4string
-#' @importFrom raster crs
-#' @importFrom grDevices chull
-NULL
-
 #' Extracts the convex hull from a Track object.
 #'
 #' \code{mp_chull} extracts the convex hull from a
-#' \code{\link[trajectories:Track-class]{Track}} object and returns it
-#' as \code{\link[sp:SpatialPolygons-class]{SpatialPolygons}} object.
+#' \code{Track} object and returns it
+#' as \code{SpatialPolygons}.
 #'
 #' @param t An object of class \code{\link[trajectories:Track-class]{Track}}.
-#' @return An object of class \code{\link[sp:SpatialPolygons-class]{SpatialPolygons}}
+#' @return A \code{\link[sp:SpatialPolygons]{SpatialPolygons}}
 #' with coordinates corresponding to coordinates of points of the convex hull.
 #' @seealso .
 #' @examples #
 #' @export
-mp_chull <- function(t){
+mp_chull <- function(t) {
 
   # checks
   if(!(inherits(t, "Track"))){

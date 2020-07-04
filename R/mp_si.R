@@ -1,9 +1,3 @@
-#' @importFrom Rdpack reprompt
-#' @importFrom trajectories Track
-#' @importFrom raster area
-#' @importFrom sp SpatialLinesLengths
-NULL
-
 #' Computes various summary indicators for a Track object.
 #'
 #' \code{mp_si} is a wrapper function for functions that takes a \code{Track}
@@ -11,7 +5,7 @@ NULL
 #' \code{Track} object. The functions are:
 #' \enumerate{
 #'   \item \code{\link{mp_locations_altitude_average}}
-#'   \item \code{\link{mp_altitude_range}}
+#'   \item \code{\link{mp_altitude_range}} (to compute the minimum and maximum altitude)
 #'   \item \code{\link{mp_altitude_difference}}
 #'   \item \code{\link{mp_altitude_total_distance}}
 #'   \item \code{\link{mp_altitude_total_relative_distance}}
@@ -21,12 +15,13 @@ NULL
 #'   \item \code{\link{mp_latitude_difference}}
 #'   \item \code{\link{mp_longitude_sum}}
 #'   \item \code{\link{mp_latitude_sum}}
-#'   \item \code{\link{mp_chull}}
+#'   \item \code{\link{mp_chull}} (to compute the area and perimeter of the convex hull)
 #'   \item \code{\link{mp_locations_direction_average}}
 #'   \item \code{\link{mp_locations_direction_sd}}
-#'   \item \code{\link{mp_locations_count}} with \code{repeated = FALSE}
-#'   \item \code{\link{mp_locations_count}} with \code{repeated = TRUE}
+#'   \item \code{\link{mp_locations_direction_average}}
+#'   \item \code{\link{mp_locations_count}} (to count unique campsite locations and repeated campsite visits)
 #'   \item \code{\link{mp_gap_proportion}}
+#'   \item \code{\link{mp_straightness_index}}
 #'   \item \code{\link{mp_linearity}}
 #' }
 #'
@@ -39,7 +34,8 @@ NULL
 #' @seealso .
 #' @examples #
 #' @export
-mp_si <- function(t, fun = stats::median){
+mp_si <- function(t,
+                  fun = stats::median) {
 
   # checks
   if(!(inherits(t, "Track"))) {

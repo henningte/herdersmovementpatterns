@@ -19,7 +19,7 @@ in \code{t}.
 }
 \description{
 \code{mp_locations_distance_average} computes the mean distance between
-locations of a \code{\link[trajectories:Track-class]{Track}} in the order of movement.
+locations of a \code{Track} in the order of movement.
 Several options are available.
 }
 \examples{

@@ -24,7 +24,7 @@ in \code{t}.
 }
 \description{
 \code{mp_locations_count} counts unique lcoations of a
-\code{\link[trajectories:Track-class]{Track}}. Several options are available.
+\code{Track}. Several options are available.
 }
 \examples{
 #

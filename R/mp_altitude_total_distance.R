@@ -1,11 +1,7 @@
-#' @importFrom Rdpack reprompt
-#' @importFrom trajectories Track
-NULL
-
 #' Computes the total altitude distance covered by a Track object.
 #'
 #' \code{mp_altitude_total_distance} computes the total altitude distance
-#' covered by a \code{\link[trajectories:Track-class]{Track}} (sum of absolute altitude
+#' covered by a \code{Track} (sum of absolute altitude
 #' distances).
 #'
 #' @param t An object of class \code{\link[trajectories:Track-class]{Track}}
@@ -15,7 +11,7 @@ NULL
 #' @seealso .
 #' @examples #
 #' @export
-mp_altitude_total_distance <- function(t){
+mp_altitude_total_distance <- function(t) {
 
   # compute the latitude difference
   sum(abs(t@data$altitude[-1] - t@data$altitude[-length(t)]))

@@ -1,11 +1,7 @@
-#' @importFrom Rdpack reprompt
-#' @importFrom rlang .data
-NULL
-
 #' Extracts information on gaps from a \code{data.frame} representing a \code{Trackscollection} object.
 #'
 #' \code{mp_tcdf_extract_gaps} extracts information on gaps from a
-#' \code{\link[trajectories:Track-class]{TracksCollection}} object
+#' \code{TracksCollection} object
 #' that was combined using \code{\link{mp_tc_rbind}}.
 #'
 #' @param tcdf A \code{data.frame} as returned by \code{\link{mp_tc_rbind}}
@@ -50,7 +46,8 @@ NULL
 #' @seealso .
 #' @examples #
 #' @export
-mp_tcdf_extract_gaps <- function(tcdf, dummy = TRUE){
+mp_tcdf_extract_gaps <- function(tcdf,
+                                 dummy = TRUE) {
 
   # checks
   stopifnot(inherits(tcdf, "data.frame"))
@@ -76,8 +73,8 @@ mp_tcdf_extract_gaps <- function(tcdf, dummy = TRUE){
   # group by households and gap
   hh1 <- dplyr::group_by(hh, .data$household, .data$location, .data$group)
   hh1 <- dplyr::summarise(hh1,
-                          row_start = dplyr::first(row),
-                          row_end = dplyr::last(row),
+                          row_start = dplyr::first(.data$row),
+                          row_end = dplyr::last(.data$row),
                           time_start = dplyr::first(.data$time),
                           time_end = dplyr::last(.data$time),
                           duration = as.numeric(difftime(dplyr::last(.data$time), dplyr::first(.data$time))),

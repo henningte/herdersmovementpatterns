@@ -11,14 +11,14 @@ mp_tc_rbind(tc)
 with all \code{Track} objects having the same length and temporal resolution.}
 }
 \value{
-a \code{data.table} object with thw row-wise binded data slots of the
+a \code{data.table} object with the row-wise binded data slots of the
 \code{Track} objects of \code{tc} and two additional variables, \code{household}
 (a numeric vector with an id for each household) and \code{time} (a \code{Date}
 vector with the date information of each \code{Track} object).
 }
 \description{
-\code{mp_tc_rbind} binds the data slots of \code{\link[trajectories:Track-class]{Track}} objects
-in a \code{\link[trajectories:Track-class]{TracksCollection}} object row-wise
+\code{mp_tc_rbind} rowwise binds the data slots of \code{Track} objects
+in a \code{TracksCollection} object.
 }
 \examples{
 #

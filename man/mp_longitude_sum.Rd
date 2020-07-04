@@ -16,7 +16,7 @@ for \code{t}.
 }
 \description{
 \code{mp_longitude_sum} sums the longitude differences between adjacent campsite
-locations for a \code{\link[trajectories:Track-class]{Track}}.
+locations for a \code{Track}.
 }
 \examples{
 #

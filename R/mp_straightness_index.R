@@ -1,25 +1,18 @@
-#' @importFrom Rdpack reprompt
-#' @importFrom trajectories Track
-#' @importFrom spacetime STIDF
-NULL
-
 #' Computes the straightness index for the trajectory between the first and last campsite location in a Track object.
 #'
 #' \code{mp_straightness_index} computes the straightness index
-#' \insertCite{Laube.2007}{herdersmovementpatterns} for the
-#' trajectory between the first and last locations of a
+#' \insertCite{Laube.2007}{herdersmovementpatterns} for the trajectory between the first and last locations of a
 #' \code{Track} object in the order of movement.
 #'
 #' @param t An object of class \code{\link[trajectories:Track-class]{Track}}
 #' with a variable \code{location} and \code{campsite}
 #' @return a numeric value representing the straightness index for
 #' \code{t}.
-#' @seealso .
 #' @references
-#'  \insertAllCited{}
+#'    \insertAllCited{}
 #' @examples #
 #' @export
-mp_straightness_index <- function(t){
+mp_straightness_index <- function(t) {
 
   # checks
   if(!(inherits(t, "Track"))) {

@@ -22,7 +22,7 @@ a numeric value representing the average altitude of the locations in \code{t}.
 }
 \description{
 \code{mp_locations_altitude_average} computes the average altitude of lcoations of a
-\code{\link[trajectories:Track-class]{Track}}. Several options are available. For each
+\code{Track}. Several options are available. For each
 location, only one value is considered (i.e. thetemporal duration of visits is not
 considered as weights during computations).
 }

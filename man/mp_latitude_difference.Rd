@@ -17,7 +17,7 @@ most northern and most southern points in \code{t}.
 \description{
 \code{mp_latitude_difference} computes the latitudinal difference between
 the most northern and most southern points of a
-\code{\link[trajectories:Track-class]{Track}}.
+\code{Track}.
 }
 \examples{
 #

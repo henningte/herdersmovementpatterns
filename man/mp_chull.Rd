@@ -10,13 +10,13 @@ mp_chull(t)
 \item{t}{An object of class \code{\link[trajectories:Track-class]{Track}}.}
 }
 \value{
-An object of class \code{\link[sp:SpatialPolygons-class]{SpatialPolygons}}
+A \code{\link[sp:SpatialPolygons]{SpatialPolygons}}
 with coordinates corresponding to coordinates of points of the convex hull.
 }
 \description{
 \code{mp_chull} extracts the convex hull from a
-\code{\link[trajectories:Track-class]{Track}} object and returns it
-as \code{\link[sp:SpatialPolygons-class]{SpatialPolygons}} object.
+\code{Track} object and returns it
+as \code{SpatialPolygons}.
 }
 \examples{
 #

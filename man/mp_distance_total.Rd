@@ -14,7 +14,7 @@ a numeric value representing the total distance covered by \code{t}.
 }
 \description{
 \code{mp_distance_total} computes the total distance covered by a
-\code{\link[trajectories:Track-class]{Track}}. This is the sum of all distance
+\code{Track}. This is the sum of all distance
 values in the \code{connections} slot.
 }
 \examples{

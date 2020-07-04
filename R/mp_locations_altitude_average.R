@@ -1,11 +1,7 @@
-#' @importFrom Rdpack reprompt
-#' @importFrom trajectories Track
-NULL
-
 #' Computes the average altitude of locations of a Track object.
 #'
 #' \code{mp_locations_altitude_average} computes the average altitude of lcoations of a
-#' \code{\link[trajectories:Track-class]{Track}}. Several options are available. For each
+#' \code{Track}. Several options are available. For each
 #' location, only one value is considered (i.e. thetemporal duration of visits is not
 #' considered as weights during computations).
 #'
@@ -20,7 +16,9 @@ NULL
 #' @seealso .
 #' @examples #
 #' @export
-mp_locations_altitude_average <- function(t, fun = stats::median, campsite = TRUE){
+mp_locations_altitude_average <- function(t,
+                                          fun = stats::median,
+                                          campsite = TRUE) {
 
   # checks
   if(!(inherits(t, "Track"))) {

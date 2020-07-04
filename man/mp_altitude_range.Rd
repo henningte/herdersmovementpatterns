@@ -16,7 +16,7 @@ of \code{t}.
 }
 \description{
 \code{mp_altitude_range} extracts the altitude range
-\code{\link[trajectories:Track-class]{Track}} object with a variable
+\code{Track} object with a variable
 \code{altitude} in the data slot. \code{NA}s are removed.
 }
 \examples{

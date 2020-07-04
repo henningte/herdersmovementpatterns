@@ -1,12 +1,7 @@
-#' @importFrom Rdpack reprompt
-#' @importFrom trajectories Track Tracks TracksCollection
-#' @importFrom spacetime STIDF
-NULL
-
 #' Clips \code{TrackCollections} to specified time windows
 #'
-#' \code{tc_clip} clips the \code{\link[trajectories:Track-class]{Track}} objects of
-#' a \code{\link[trajectories:Track-class]{TracksCollection}} object for
+#' \code{tc_clip} clips the \code{Track} objects of
+#' a \code{TracksCollection} object for
 #' specified time windows.
 #'
 #' @param tc An object of class
@@ -25,7 +20,8 @@ NULL
 #' @seealso .
 #' @examples #
 #' @export
-tc_clip <- function(tc, d){
+tc_clip <- function(tc,
+                    d) {
 
   # checks
   stopifnot(inherits(tc, "TracksCollection"))
@@ -43,14 +39,14 @@ tc_clip <- function(tc, d){
     index <- d_index[x,1]:d_index[x,2]
 
     # clip the trajectories
-    tc_cliped <- TracksCollection(lapply(tc@tracksCollection, function(t){
+    tc_cliped <- trajectories::TracksCollection(lapply(tc@tracksCollection, function(t){
 
       t <- t@tracks[[1]]
 
-      Tracks(list(trajectories::Track(track = spacetime::STIDF(sp = t@sp[index,],
-                                                               time = t@time[index],
-                                                               data = t@data[index,],
-                                                               endTime = t@time[index]))))
+      trajectories::Tracks(list(trajectories::Track(track = spacetime::STIDF(sp = t@sp[index,],
+                                                                             time = t@time[index],
+                                                                             data = t@data[index,],
+                                                                             endTime = t@time[index]))))
 
     }))
 

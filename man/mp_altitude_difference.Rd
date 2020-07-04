@@ -17,7 +17,7 @@ highest and the lowest point in \code{t}.
 \description{
 \code{mp_altitude_difference} computes the altitude difference between
 the highest and the lowest point of a
-\code{\link[trajectories:Track-class]{Track}} object with a variable
+\code{Track} object with a variable
 \code{altitude} in the data slot. \code{NA}s are removed.
 }
 \examples{

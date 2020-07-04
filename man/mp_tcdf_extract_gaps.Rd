@@ -52,7 +52,7 @@ a \code{data.frame} object with the following variables:
 }
 \description{
 \code{mp_tcdf_extract_gaps} extracts information on gaps from a
-\code{\link[trajectories:Track-class]{TracksCollection}} object
+\code{TracksCollection} object
 that was combined using \code{\link{mp_tc_rbind}}.
 }
 \examples{

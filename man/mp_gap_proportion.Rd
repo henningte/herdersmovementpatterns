@@ -16,7 +16,7 @@ in \code{t}.
 }
 \description{
 \code{mp_gap_proportion} computes the proportion of gaps in a
-\code{\link[trajectories:Track-class]{Track}}.
+\code{Track}.
 }
 \examples{
 #

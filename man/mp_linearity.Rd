@@ -16,7 +16,7 @@ a numeric value representing the straightness index for
 }
 \description{
 \code{mp_linearity} computes an estimate of the
-linearity of a trajectory (object of class \code{\link[trajectories:Track-class]{Track}})
+linearity of a trajectory (object of class \code{Track})
 by (1) extracting the maximum distance between any two locations,
 (2) extracting the maximum distance between any two remaining locations
 orthogonal to the first line and (3) dividing the values extracted in (1) and (2).
