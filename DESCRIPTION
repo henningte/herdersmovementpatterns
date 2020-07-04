@@ -1,39 +1,51 @@
 Package: herdersmovementpatterns
-Title: Computing Movement Summary Indicators for GPS Trajectories of Nomadic Households
-Version: 0.0.0.9000
-Authors@R:
-    c(person(given = "Henning",
-           family = "Teickner",
-           role = c("aut", "cre"),
-           email = "h_teic01@wwu.de"),
-      person(given = "Christian",
-           family = "Knoth",
-           role = c("aut"),
-           email = "christian.knoth@uni-muenster.de")     
-           )
-Description: This package computes various movement summary indicators
-    for GPS trajectories of nomadic households that were processed with the
-    R package HerdersTrajectories (\url{https://github.com/henningte/herdersTA}).
-License: GPL-3 + file LICENSE
+Title: Research compendium for "Patterns in Mongolian Nomadic Household Movement Derived from GPS Trajectories"
+Version: 1.0.0
+Authors@R: c(
+    person(given = "Henning", family = "Teickner", role = c("aut", "cre"), email = "henning.teickner@uni-muenster.de"),
+    person(given = "Christian", family = "Knoth", role = c("aut"), email = "christian.knoth@uni-muenster.de"),
+    person(given = "Bartoschek", family = "Thomas", role = c("aut")),
+    person(given = "Kati", family = "Kraehnert", role = c("aut")),
+    person(given = "Melinda", family = "Vigh", role = c("aut")),
+    person(given = "Myagmartseren", family = "Purevtseren", role = c("aut")),
+    person(given = "Munkhnaran", family = "Sugar", role = c("aut")),
+    person(given = "Kati", family = "Kraehnert", role = c("aut")),
+    person(given = "Edzer", family = "Pebesma", role = c("aut"))
+    )
+Description: This is the research compendium \insertCite{Marwick.2019}{herdersmovementpatterns} for the
+  manuscript "Patterns in Mongolian Nomadic Household Movement Derived from GPS Trajectories", including the
+  Rmarkdown script, and data used to generate the manuscript. No raw trajectory data ar provided for ethical
+  reasons.
+License: GPL-3
 ByteCompile: true
 Encoding: UTF-8
 LazyData: true
+Depends:
+    R (>= 3.3.2)
 Imports: 
-    methods,
-    bookdown,
-    here,
-    Rdpack,
-    sp,
-    raster,
-    dplyr,
-    rlang,
-    rgeos,
-    spacetime,
     trajectories,
-    data.table
-Suggests: 
-    devtools,
-    git2r
+    data.table,
+    spacetime,
+    dplyr,
+    ggplot2,
+    Rdpack,
+    raster,
+    rlang,
+    herdersTA,
+    methods,
+    rgeos,
+    sp
 RdMacros: 
     Rdpack
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
+Suggests: 
+    magrittr,
+    tidyr,
+    directlabels,
+    vegan,
+    MuMIn,
+    cowplot,
+    kableExtra,
+    sf,
+    dendextend,
+    knitr

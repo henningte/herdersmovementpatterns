@@ -1,6 +1,5 @@
-.Rproj.user
 .Rhistory
 .RData
-/analysis
-README.Rmd
-README.md
+.Rproj.user
+DESCRIPTION
+NAMESPACE
